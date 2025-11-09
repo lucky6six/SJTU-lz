@@ -1,24 +1,39 @@
 % !TEX root = ../main.tex
 
 \begin{abstract}[zh]
-  中文摘要应该将学位论文的内容要点简短明了地表达出来，应该包含论文中的基本信息，
-  体现科研工作的核心思想。摘要内容应涉及本项科研工作的目的和意义、研究方法、研究
-  成果、结论及意义。注意突出学位论文中具有创新性的成果和新见解的部分。摘要中不宜
-  使用公式、化学结构式、图表和非公知公用的符号和术语，不标注引用文献编号。硕士学
-  位论文中文摘要字数为 500 字左右，博士学位论文中文摘要字数为 800 字左右。英文摘
-  要内容应与中文摘要内容一致。
+在当今云计算与人工智能技术深度融合的时代，云存储基础设施所承载的工作负载正经历着根本性的变革。一方面，企业级应用持续产生海量的文档、日志与虚拟机镜像等传统数据；另一方面，以大语言模型和深度学习为代表的AI应用，催生了规模庞大且占比快速增长的模型参数文件（如 .pt, .safetensors 格式）。这种传统数据与AI模型数据共存的混合负载场景，已成为现代云存储数据中心的新常态。在此背景下，重复数据删除 作为提升存储效率、降低运营成本的核心技术，其效能正面临前所未有的严峻挑战。
 
-  摘要页的下方注明本文的关键词（4 \textasciitilde{} 6 个）。
+本研究深入剖析了传统重复数据删除技术在此新环境下失效的根本原因。传统技术范式依赖于“固定大小分块—指纹计算—指纹比对”的粗粒度匹配逻辑。研究发现，该范式在面对新型负载时存在两大固有瓶颈：其一，对AI模型数据失效。模型文件由浮点数张量构成，其每个数据块几乎都是全局唯一的，使得基于块指纹精确匹配的全局去重机制近乎完全无效。模型数据真正的冗余在于其细粒度的数值相似性，具体表现为浮点数指数位高位的高度重复，这是一种传统字节级去重技术无法感知的语义冗余。其二，对大块传统数据低效。为追求高吞吐而采用的MB级大数据块，使得找到完全相同块的几率骤降。尽管这些大块内部存在丰富的局部连续重复序列（如重复的日志条目、相同的代码库或文档段落），但传统的块级处理粒度对此类冗余视而不见，导致去重率急剧下降。
+
+现有的优化方案，无论是专为模型数据设计的压缩编码工具，还是针对大块内部冗余的检测技术，均是为单一场景设计的专用方案。在真实的混合备份数据流中，这些方案会相互干扰：将模型压缩算法应用于文本数据会导致压缩率下降（负优化），而将文本冗余检测技术用于模型数据则收效甚微。因此，开发一套能够智能识别并协同处理多种冗余模式的统一框架，是突破当前技术瓶颈的关键。
+
+为解决上述挑战，本论文设计并实现了一套面向混合负载的、具备细粒度冗余识别能力的新一代重复数据删除系统。系统的核心创新是提出了 “分治” 架构，其首要关键是突破性地设计了一种轻量级、块级、基于内容的冗余模式鉴别探针。该探针摒弃了不可靠的文件后缀名等元数据，通过实时分析数据块的数值分布与字节模式规律（如检测以2/4字节为周期的循环相似性），能够快速、准确地将数据块鉴别为“蕴含数值冗余的模型数据块”或“蕴含局部连续冗余的传统数据块”。
+
+基于精确的鉴别结果，系统实施差异化的细粒度去重策略。对于模型数据块，我们设计了专用的浮点数编码器，其核心在于理解并提取浮点数内部的数值冗余，通过将高度相似的指数位高位进行剥离、重组，形成一个全新的、冗余度极高的数据表征，从而为后续的通用压缩器创造极高的压缩潜力。对于传统数据块，我们优化并实现了增强的去重器，该模块专注于在大块内部进行更细粒度的扫描，通过高效的变长切分或滑动窗口匹配算法，发现并消除其中的长连续重复序列，从而显著提升单一大块数据的内部去重率。
+
+我们在开源重复数据删除框架Destor上实现了完整的系统原型，并进行了全面的实验评估。测试数据集中包含了从20\%到80\%不同比例的模型数据，以模拟真实世界的混合场景。实验结果表明：在去重率方面，我们的系统在各种混合场景下均稳定地优于所有基线方法。相较于传统去重技术，有效去重率提升了20\%至30\%。随着数据集中模型数据占比的升高以及数据块尺寸的增大，我们系统的优势愈发明显，这证明了其卓越的适应性与前瞻性。在吞吐性能方面，系统整体开销与基线相比处于同一量级，体现了其轻量级设计的高效性。
+
+综上所述，本研究不仅精准诊断了传统重复数据删除技术在AI时代面临的技术瓶颈，更创新性地提出并验证了一套以细粒度冗余识别和分治处理为核心的完整解决方案。该系统能够有效应对当前混合云存储环境下的数据缩减难题，并为未来数据负载的持续演进提供了强有力的技术支撑，具有重要的理论价值与广阔的工程应用前景。
+  % 摘要页的下方注明本文的关键词（4 \textasciitilde{} 6 个）。
 \end{abstract}
 
 \begin{abstract}[en]
-  Shanghai Jiao Tong University (SJTU) is a key university in China. SJTU was
-  founded in 1896. It is one of the oldest universities in China. The University
-  has nurtured large numbers of outstanding figures include JIANG Zemin, DING
-  Guangen, QIAN Xuesen, Wu Wenjun, WANG An, etc.
+In the contemporary era marked by the deep integration of cloud computing and artificial intelligence technologies, the workloads borne by cloud storage infrastructures are undergoing a fundamental transformation. On one hand, enterprise applications continuously generate massive amounts of traditional data such as documents, logs, and virtual machine images; on the other hand, AI applications represented by large language models and deep learning have given rise to model parameter files (e.g., .pt, .safetensors formats) that are both voluminous and rapidly increasing in proportion. This coexistence of traditional data and AI model data in mixed workload scenarios has become the new normal for modern cloud storage data centers. In this context, deduplication, as a core technology for enhancing storage efficiency and reducing operational costs, is facing unprecedented challenges.
 
-  SJTU has beautiful campuses, Bao Zhaolong Library, Various laboratories. It
-  has been actively involved in international academic exchange programs. It is
-  the center of CERNet in east China region, through computer networks, SJTU has
-  faster and closer connection with the world.
+This study delves into the fundamental reasons behind the failure of traditional deduplication techniques in this new environment. The traditional technical paradigm relies on a coarse-grained matching logic of "fixed-size chunking—fingerprint computation—fingerprint comparison." The research finds that this paradigm has two inherent bottlenecks when facing new workloads: first, it fails for AI model data. Model files consist of floating-point tensors, where nearly every data chunk is globally unique, rendering the global deduplication mechanism based on exact chunk fingerprint matching nearly ineffective. The true redundancy in model data lies in its fine-grained numerical similarity, specifically manifested as high repetition in the high-order bits of floating-point exponents, a form of semantic redundancy that traditional byte-level deduplication techniques cannot perceive. Second, it is inefficient for large traditional data chunks. To pursue high throughput, MB-sized large data chunks are used, which drastically reduces the likelihood of finding identical chunks. Although these large chunks contain rich local continuous repetitive sequences (such as repeated log entries, identical code repositories, or document sections), the chunk-level processing granularity of traditional methods overlooks such redundancy, leading to a sharp decline in deduplication rates.
+
+Existing optimization solutions, whether compression encoding tools designed specifically for model data or detection techniques targeting internal redundancy
+in large chunks, are specialized solutions designed for single scenarios. In real mixed backup data streams, these solutions interfere with each other: applying model compression algorithms to text data leads to reduced compression rates (negative optimization), while using text redundancy detection techniques for model data yields minimal results. Therefore, developing a unified framework capable of intelligently identifying and collaboratively processing multiple redundancy patterns is key to breaking through current technical bottlenecks.
+
+To address the above challenges, this thesis designs and implements a new generation deduplication system for
+mixed workloads, equipped with fine-grained redundancy recognition capabilities. The core innovation of the system is the proposed "divide-and-conquer" architecture, whose primary key is the breakthrough design of a lightweight, chunk-level, content-based redundancy pattern identification probe. This probe abandons unreliable metadata such as file suffixes and quickly and accurately identifies data chunks as "model data chunks containing numerical redundancy" or "traditional data chunks containing local continuous redundancy" through real-time analysis of the numerical distribution and byte pattern regularities of data chunks (e.g., detecting cyclic similarity with 2/4-byte periodicity).
+
+Based on accurate identification results, the system implements differentiated fine-grained deduplication strategies. For
+model data chunks, we design a dedicated floating-point encoder, whose core lies in understanding and extracting numerical redundancy within floating-point numbers. By stripping and reorganizing the highly similar high-order bits of the exponent, a new data representation with extremely high redundancy is formed, thereby creating high compression potential for subsequent general compressors. For traditional data chunks, we optimize and implement an enhanced deduplicator that focuses on finer-grained scanning within large chunks, discovering and eliminating long continuous repetitive sequences through efficient variable-length chunking or sliding window matching algorithms, thereby significantly improving the internal deduplication rate of single large data chunks.
+
+We implemented a complete system prototype on the open-source deduplication framework Destor and conducted comprehensive
+experimental evaluations. The test dataset includes mixed scenarios simulating real-world conditions with model data proportions ranging from 20\% to 80\%. Experimental results show that in terms of deduplication rates, our system consistently outperforms all baseline methods across various mixed scenarios. Compared to traditional deduplication techniques, the effective deduplication rate improved by 20\% to 30\%. As the proportion of model data in the dataset increases and the data chunk size grows, the advantages of our system become more pronounced, demonstrating its excellent adaptability and foresight. In terms of throughput performance, the overall overhead of the system is on par with the baselines, reflecting the efficiency of its lightweight design.
+
+In summary, this research not only accurately diagnoses the technical bottlenecks faced by traditional deduplication techniques in the AI era but also innovatively proposes and validates a complete solution centered on fine-grained redundancy recognition and divide-and-conquer processing. This system effectively addresses the data reduction challenges in the current mixed cloud storage environment and provides strong technical support for the continuous evolution of future data workloads, with significant theoretical value and broad engineering application prospects.
+
 \end{abstract}
