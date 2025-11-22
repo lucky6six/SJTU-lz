@@ -1,0 +1,73 @@
+sequenceDiagram
+    autonumber
+    participant Src as 数据源
+    participant Read as Read 线程
+    participant ReadQ as read queue
+    participant Chunk as Chunk 线程
+    participant HandlerQ as handler queue
+    participant Hash as Hash 线程
+    participant Dedup as Dedup 线程
+    participant Local as 局部缓存 (container buffer)
+    participant Temp as 临时索引缓存 (index buffer)
+    participant Global as 全局缓存 (feature cache)
+    participant KV as 磁盘 KV 存储
+    participant Identify as Identify 线程
+    participant ModelEnc as Model Encode 线程
+    participant FineHash as Fine-hash 线程
+    participant FineDedup as Fine-dedup 线程
+    participant Diff as Diff 线程
+    participant Compress as 压缩线程
+    participant SaveQ as save queue
+    participant Save as Save 线程
+
+    Note over Src,ReadQ: 数据流入
+    Src->>Read: 读取输入流
+    Read->>ReadQ: 推入 read queue
+    ReadQ->>Chunk: Chunk 线程消费 segment
+    Chunk->>HandlerQ: 切块并聚合为segment
+
+    HandlerQ-->>Hash: Hash 线程按 segment 获取数据
+    Hash->>Dedup: 计算块指纹并送去重阶段
+
+    Note over Dedup,KV: 去重阶段的缓存查找顺序
+    Dedup->>Local: 查询局部缓存 (container buffer)
+    alt 局部命中
+        Local-->>Dedup: 返回映射 -> 标记为 DEDUP / MATCH
+    else 局部未命中
+        Dedup->>Temp: 查询临时索引缓存 (index buffer)
+        alt 临时命中
+            Temp-->>Dedup: 返回映射 -> 继续处理
+        else 临时未命中
+            Dedup->>Global: 查询全局缓存 (feature cache)
+            alt 全局命中
+                Global-->>Dedup: 返回容器指针 -> 继续处理
+            else 全局未命中
+                Dedup->>KV: 访问磁盘 KV 索引 (按容器为单位查找)
+                KV-->>Dedup: 返回容器索引或无结果
+                alt KV 返回容器信息
+                else 无匹配
+                    Dedup-->>Dedup: 标记为 UNIQUE，进入后续处理
+                end
+            end
+        end
+    end
+
+    Note over Dedup,Identify: 路由到不同处理路径
+    Dedup->>Identify: block type != DEDUP 则送入鉴别流程
+    Identify->>Dedup: 标记为 MODEL 或 NON-MODEL
+
+    alt MODEL 路径
+        Identify->ModelEnc: 送 Model Encode 线程（字节分组、提取低熵组）
+        ModelEnc->Compress: 输出编码后数据 -> 进入压缩
+    else NON-MODEL 路径
+        Dedup->FineHash: 送 Fine-hash（双向子块切分 + 特征提取）
+        FineHash->FineDedup: 提供细粒度特征以查找相似块
+        FineDedup->Diff: 找到匹配子块后提取差异 (diff)
+        Diff->Compress: 将差异/唯一部分送压缩
+    end
+
+    Compress->SaveQ: 压缩结果推入 save queue
+    SaveQ-->Save: Save 线程消费
+    Save->KV: 聚合并写容器到后端存储（落盘）
+    Save->Global: 异步更新全局缓存（容器范围映射）
+    Save->Temp: 清理/失效相关临时索引条目

@@ -1,0 +1,45 @@
+sequenceDiagram
+    autonumber
+    participant Dedup as 去重线程 (dedup/fine-dedup)
+    participant Local as 局部缓存 (container buffer)
+    participant Temp as 临时索引缓存 (index buffer)
+    participant Global as 全局缓存 (feature cache)
+    participant KV as 磁盘 KV 存储 (底层索引)
+    participant Save as 保存线程(save)
+
+    Note over Dedup,KV: 单次块的细粒度匹配流程
+
+    Dedup->>Local: 查询子块指纹/特征映射
+    alt Local 命中
+        Local-->>Dedup: 返回容器ID + 偏移 -> 直接标记为 MATCH/DEDUP
+    else Local 未命中
+        Dedup->>Temp: 查询临时索引缓存
+        alt Temp 命中
+            Temp-->>Dedup: 返回映射 -> 标记为 MATCH/继续处理
+        else Temp 未命中
+            Dedup->>Global: 查询全局 feature cache
+            alt Global 命中
+                Global-->>Dedup: 返回容器ID + 偏移
+            else Global 未命中
+                Dedup->>KV: 访问磁盘 KV 索引 (按容器为单位查找)
+                KV-->>Dedup: 返回容器元索引或无结果
+                alt KV 返回容器信息
+                    KV->>Global: 预取容器和容器元索引
+                    Global-->>Dedup: 返回容器数据/元信息
+                else KV 无匹配
+                    Dedup-->>Dedup: 标记为 UNIQUE，进入后续处理
+                end
+            end
+        end
+    end
+    Dedup->>Local: 更新局部缓存
+    Dedup->>Temp: 更新临时索引缓存
+    alt container 容量已满
+        Local->>Save:容器异步落盘
+    end
+    
+
+    Note over Save,Global: 容器落盘时异步更新
+    Save->>KV:索引落盘
+    Save->>Global: 更新全局缓存（容器范围映射）
+    Save->>Temp: 清理/失效相关临时索引条目

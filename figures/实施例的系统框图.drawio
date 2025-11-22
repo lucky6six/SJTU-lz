@@ -1,0 +1,154 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2">
+  <diagram name="第 1 页" id="mC0PBxtbyiLrJZPAR2Ql">
+    <mxGraphModel dx="976" dy="1955" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-52" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="130" y="80" width="490" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-1" target="hLoWIEOJ-53-CGVY-2Za-17" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-1" target="hLoWIEOJ-53-CGVY-2Za-26" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-1" value="数据类型&lt;br&gt;鉴别模块" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="1" vertex="1">
+          <mxGeometry x="300" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-2" value="模型数据&lt;br&gt;处理模块" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="1" vertex="1">
+          <mxGeometry x="195" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-54" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.744;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-3" target="hLoWIEOJ-53-CGVY-2Za-45" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-3" value="非模型数据&lt;br&gt;处理模块" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="1" vertex="1">
+          <mxGeometry x="405" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="240" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-28" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-5" target="hLoWIEOJ-53-CGVY-2Za-12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-5" value="块级数据块去重" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="205" y="30" width="310" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-6" value="待保存数据块" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="190" y="140" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-7" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="270" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-8" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="300" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="330" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-12" target="hLoWIEOJ-53-CGVY-2Za-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-12" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-13" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="390" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-14" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="420" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-15" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="450" y="110" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-16" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="195" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-17" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="225" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-18" target="hLoWIEOJ-53-CGVY-2Za-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-18" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="255" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-19" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="285" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-24" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="405" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-25" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="435" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-26" target="hLoWIEOJ-53-CGVY-2Za-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-26" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="465" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-27" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#23445d;" parent="1" vertex="1">
+          <mxGeometry x="495" y="230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-32" value="DDR4 内存" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="130" y="90" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-38" value="待保存模型数据块" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="140" y="260" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-39" value="待保存非模型数据块" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="340" y="260" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-42" value="服务器" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="145" y="-60" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-43" value="&lt;span style=&quot;text-align: start; font-family: 宋体;&quot; lang=&quot;EN-US&quot;&gt;&lt;font&gt;Intel(R) Core(TM) i5-8500 CPU&lt;/font&gt;&lt;br&gt;&lt;/span&gt;&lt;span style=&quot;font-size: medium; text-align: start;&quot;&gt;&lt;/span&gt;CPU软件处理器" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="205" y="-90" width="310" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-44" value="软件系统（一种面向混合负载的存储数据缩减系统）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;" parent="1" vertex="1">
+          <mxGeometry x="205" y="-40" width="310" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-45" value="持久化数据缩减后的数据块" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;" parent="1" vertex="1">
+          <mxGeometry x="130" y="400" width="450" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-50" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.276;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-2" target="hLoWIEOJ-53-CGVY-2Za-45" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="235" y="399" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-53" value="NVMe SSD" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="130" y="410" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-55" target="hLoWIEOJ-53-CGVY-2Za-59" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-55" value="细粒度特征&lt;br&gt;记录表" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;" parent="1" vertex="1">
+          <mxGeometry x="650" y="80" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-56" value="NVMe SSD" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="650" y="80" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-57" target="hLoWIEOJ-53-CGVY-2Za-59" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-57" value="冗余区域&lt;br&gt;记录表" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;" parent="1" vertex="1">
+          <mxGeometry x="650" y="182.5" width="90" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="hLoWIEOJ-53-CGVY-2Za-59" target="hLoWIEOJ-53-CGVY-2Za-3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="570" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hLoWIEOJ-53-CGVY-2Za-59" value="数据缓存" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" parent="1" vertex="1">
+          <mxGeometry x="530" y="180" width="80" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="q_nVF-w-AhEsGsTODc0Q-1" value="NVMe SSD" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="650" y="180" width="80" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

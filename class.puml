@@ -1,0 +1,130 @@
+@startuml
+' mydedup 高层结构体类图（C structs -> UML classes）
+' 生成于仓库 mydedup
+skinparam classAttributeIconSize 0
+
+title mydedup - High-level Data Structure Diagram
+
+class destor {
+  +sds working_directory
+  +int dedup_type
+  +int simulation_level
+  +int trace_format
+  +int verbosity
+  +int chunk_algorithm
+  +int index_cache_size
+  +int rewrite_algorithm[2]
+  +int64_t chunk_num
+  +int64_t stored_chunk_num
+  +... (配置与统计字段)
+}
+
+class chunk {
+  +int32_t size
+  +int flag
+  +containerid id
+  +fingerprint fp
+  +unsigned char *data
+  +fingerprint hfp
+  +int32_t burst_size
+}
+
+class segment {
+  +segmentid id
+  +int32_t chunk_num
+  +GSequence *chunks
+  +GHashTable *features
+}
+
+class SyncQueue {
+  +int term
+  +int max_size
+  +Queue *queue
+  +pthread_mutex_t mutex
+  +pthread_cond_t max_work
+  +pthread_cond_t min_work
+  +sync_queue_new()
+  +sync_queue_push()
+  +sync_queue_pop()
+}
+
+class rewrite_buffer_t {
+  +GQueue *chunk_queue
+  +GSequence *container_record_seq
+  +int num
+  +int size
+}
+
+class containerMeta {
+  +containerid id
+  +int32_t data_size
+  +int32_t chunk_num
+  +GHashTable *map
+}
+
+class container {
+  +containerMeta meta
+  +unsigned char *data
+}
+
+class indexElem {
+  +containerid id
+  +fingerprint fp
+}
+
+class index_buffer {
+  +GHashTable *buffered_fingerprints
+  +GHashTable *buffered_headfingerprints
+  +int chunk_num
+}
+
+class backupVersion {
+  +sds path
+  +int32_t bv_num
+  +int64_t number_of_files
+  +int64_t number_of_chunks
+}
+
+class fileRecipeMeta {
+  +int64_t chunknum
+  +int64_t filesize
+  +sds filename
+}
+
+class segmentRecipe {
+  +segmentid id
+  +GHashTable *kvpairs
+}
+
+class jcr {
+  +int32_t id
+  +sds path
+  +int status
+  +int64_t data_size
+  +int32_t chunk_num
+  +...stats...
+}
+
+' 关系
+destor --> "0..*" SyncQueue : manages/uses
+chunk "1" --> "0..1" container : stored_in
+segment "1" *-- "*" chunk : contains
+rewrite_buffer_t o-- "GQueue" : uses
+rewrite_buffer_t o-- "GSequence" : uses
+container "1" *-- "1" containerMeta : has
+containerMeta --> "0..*" chunk : maps fingerprint -> offset
+index_buffer "1" *-- "*" indexElem : contains
+backupVersion "1" *-- "*" fileRecipeMeta : meta of files
+backupVersion "1" *-- "*" segmentRecipe : recipe contains segments
+jcr "1" --> "1" backupVersion : references
+
+note right of SyncQueue
+  SyncQueue 被 read/chunk/hash/trace/dedup/rewrite 等各阶段共享
+  全局实例如 read_queue, chunk_queue, hash_queue 等在 src/globals.c 中定义
+end note
+
+note left of destor
+  destor 为全局配置/统计中心（全局实例 extern struct destor destor）
+end note
+
+@enduml

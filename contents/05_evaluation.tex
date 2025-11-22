@@ -4,15 +4,53 @@
 
 
 \section{实验环境与测试方法}
+\subsection{实验环境}
+\subsection{工作负载说明}
 
-\section{各混合负载比例实验}
-\section{各类型模型文件实验}
-\section{各类型非模型文件实验}
+\begin{table}[!hpt]
+    \caption[工作负载说明表]{工作负载说明表}
+    \label{tab:firstone}
+    \centering
+    \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.41\linewidth}
+                                            >{\raggedright\arraybackslash}p{0.36\linewidth}
+                                            >{\raggedright\arraybackslash}p{0.30\linewidth} @{}}
+        \toprule
+        负载数据集 & 说明 & 参考链接 \\ \midrule
+        tar、iso 等打包文件 &
+            能识别文件中的模型数据部分 &
+            全部认为是非模型文件 \\
+        用户自定义非标准后缀的模型文件 &
+            能够识别模型数据 &
+            无效 \\
+        Q4等没有压缩空间的高熵量化文件&
+            可以将其识别为非模型数据 &
+            将其作为模型数据进行编码，得到负收益。 \\
+        header 等模型文件中的非模型部分 &
+            可以将其识别为非模型数据 &
+            将其作为模型数据进行编码，得到负收益。 \\
+        集成侵入性 &
+            可以在块处理阶段每块独立进行，对传统块级去重无影响，前序流程可以统一处理。 &
+            集成困难 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{测试对照方案}
+\subsection{测试方法}
+
+\section{各混合负载比例实验（去重率/时延）}
+
+\section{各类型模型数据去重率实验}
+
+\section{各类型非模型数据去重率实验}
+
 \section{应用集成实验}
+
 \section{其他实验}
 \subsection{鉴别准确率}
 \subsection{块大小影响实验}
 \subsection{去重来源阶段实验}
 \subsection{时延来源实验（性能开销分析）}
+
 \section{本章小结}
 
