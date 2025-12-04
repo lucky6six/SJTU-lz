@@ -27,41 +27,35 @@
 6.并行处理策略：系统需要设计高效的并行处理策略，以充分利用多核处理器的计算能力，提升细粒度去重的处理速度。
 
 \section{系统实现概述}
+
+
+\section{系统实现优化}
+
 本系统基于第3章所设计的细粒度去重架构，采用模块化设计思路，将各关键功能划分为独立模块进行实现。系统整体架构如图3.4所示。
 
 系统基于开源的传统重复数据删除系统destor\footnote{https://github.com/fomy/destor}，实现了数据类型鉴别、模型数据指数位冗余识别与压缩、非模型数据块内连续冗余去除等功能，并
 集成了ZSTD压缩模块。从而实现了一个面向混合负载的、支持细粒度冗余识别与去除的高效重复数据删除系统。
 
-系统采用C作为开发语言，主要考虑以下因素：
-
-1. C语言具有高效的性能和对底层系统资源的良好控制能力，适合实现高性能的存储去重系统。
-
-2. C语言在系统编程领域有广泛的应用，拥有丰富的库和工具支持，便于实现复杂的功能，也便于集成到传统去重系统中。
-
-3. C语言的跨平台特性使得系统能够在不同的操作系统和硬件平台上运行，提升了系统的适用性，利于应用在云存储平台。
-
 此外，为了顺利集成到传统流程中并提高系统性能，系统对相关新流程进行了细节优化，重构了数据块，
 设计了高效的数据管理与缓存策略，采用了流水线并行的处理，以应对细粒度去重带来的额外计算和存储开销。
-具体优化细节将在章节4.3中详细介绍。
 
-\section{系统实现优化}
 \subsection{数据类型鉴别：字节粒度的分组抽样熵值分析}
 \subsubsection{比特粒度的实现复杂性}
-系统需要检测各比特位的熵值以衡量其相似性，从而识别模型数据中的浮点数指数位，判定其为模型数据块，如图4.1所示。
+系统需要检测各比特位的熵值以衡量其相似性，从而识别模型数据中的浮点数指数位，判定其为模型数据块，如图~\ref{fig:bitwise_complexity}所示。
 
 然而，一方面，对整个数据块进行频繁的位操作处理会显著增加实现的复杂性和计算开销。另一方面，若抽样计算熵值，小样本中
 某些比特位可能恰好表现出低熵值，导致误判。
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.1.1.drawio.pdf}
-    \caption{比特粒度的实现复杂性示意图}
+    \bicaption{比特粒度的实现复杂性示意图}{bitwise implementation complexity diagram}
     \label{fig:bitwise_complexity}
 \end{figure}
 
 \subsubsection{可去重模型数据分析}
 因此，本文通过分析不同类型的模型数据，发现其浮点数的数据冗余和表示形式存在一定的规律性。具体而言，
 
-数值冗余规律：参考图3.3和图3.5，可以发现存在去重空间的模型数据块，其冗余集中在指数高位，该指数高位表现出较高的相似度，即较低的熵值。
+数值冗余规律：参考图~\ref{fig:d}和图~\ref{fig:float_binary}，可以发现存在去重空间的模型数据块，其冗余集中在指数高位，该指数高位表现出较高的相似度，即较低的熵值。
 从模型训练的角度分析其原理，训练中的归一化层将激活值约束在零均值、单位方差的分布附近，使得绝大多数数值在有限范围内（如[-1,1]）；
 随着模型收敛，权重更新幅度逐渐减小，数值分布更趋集中。在浮点格式中，这种分布特性直接体现为指数部分的高位比特保持稳定，
 而尾数位则承载随机性较强的精度信息。这种指数高位的低熵特性，本质上是模型收敛稳定性和数值标准化处理在存储层面的直接映射。
@@ -69,27 +63,26 @@
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.1.2.drawio.pdf}
-    \caption{模型浮点数表示形式示意图}
+    \bicaption{模型浮点数表示形式示意图}{Model floating-point representation diagram}
     \label{fig:float_representation}
 \end{figure}
 
-表示形式规律：如图4.2所示,训练过程中产生的存在数值冗余的模型文件，浮点数格式主要有FP32，BF16和FP16三种形式。而在这三种形式的表示方法中：
+表示形式规律：如图~\ref{fig:float_representation}所示,训练过程中产生的存在数值冗余的模型文件，浮点数格式主要有FP32，BF16和FP16三种形式。而在这三种形式的表示方法中：
 
 1.指数高位恰好存在于最后一字节内部，组成低熵值字节。
 
 2.这三种浮点数长度为2字节或4字节，即数据块中该低熵值字节以2字节（BF16/FP16）或4字节（FP32）的频率出现。
 
-
 \subsubsection{字节粒度的分组抽样熵值分析方法}
 基于上述结论，本文提出了一种字节粒度的分组抽样熵值分析方法，以实现高效准确的数据类型鉴别。
-如图4.3所示，系统首先对数据块进行抽样，每个抽样点相对于块头的偏移量均为4字节的整数倍。然后，
+如图~\ref{fig:bytewise_entropy}所示，系统首先对数据块进行抽样，每个抽样点相对于块头的偏移量均为4字节的整数倍。然后，
 将抽样数据按字节进行划分，逐字节分为4组，分别计算每组字节的熵值。最后，系统根据熵值分布情况，判断数据块是否为模型数据块。
 具体而言，若出现一组低熵值字节组，三组高熵值字节组，则判定该数据块为FP32类型的模型数据块。若出现两组低熵值字节组，且组索引差值为2，则判定该数据块为BF16或FP16类型的模型数据块。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.1.3.drawio.pdf}
-    \caption{字节粒度的分组抽样熵值分析示意图}
+    \bicaption{字节粒度的分组抽样熵值分析示意图}{Byte-wise grouped sampling entropy analysis diagram}
     \label{fig:bytewise_entropy}
 \end{figure}
 
@@ -111,7 +104,7 @@
 
 模型数据处理模块的目标是识别出模型数据块中数值相似的浮点数指数位所在的位置，从而将这部分集中，以便利用通用压缩算法进行数据缩减。
 
-与图4.3的流程类似同理，该模块对整个模型数据块进行数据拆分，逐字节分为4组。从而将指数位数据集中在某一组中，形成可压缩的冗余部分。
+与图~\ref{fig:bytewise_entropy}的流程类似同理，该模块对整个模型数据块进行数据拆分，逐字节分为4组。从而将指数位数据集中在某一组中，形成可压缩的冗余部分。
 
 然而，由于数据块切分的盲目性，系统既不能感知到浮点数的具体类型，也无法确保浮点数在数据块中的对齐性，甚至可能将一个浮点数切分到两个数据块中。
 因此系统并不知道哪一组才是浮点数的指数位所在组，而若像鉴别阶段一样计算分组熵值，则会产生额外的计算开销，且该阶段不再是抽样，而是需要对整个数据块进行处理，计算量更大。
@@ -120,11 +113,11 @@
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.2.drawio.pdf}
-    \caption{基于熵值分析的字节分组压缩示意图}
+    \bicaption{基于熵值分析的字节分组压缩示意图}{Byte-wise grouped compression diagram based on entropy analysis}
     \label{fig:byte_group_compression}
 \end{figure}
 
-zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的无效压缩运算。如图4.4所示,本文提出了一种基于熵值分析结论的字节分组压缩方法，
+zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的无效压缩运算。如图~\ref{fig:byte_group_compression}所示,本文提出了一种基于熵值分析结论的字节分组压缩方法，
 以高效识别指数位所在组并进行压缩。具体而言，系统在鉴别阶段已经得到了各组的熵值分布情况，并得到了低熵值字节组的索引，该索引实际代表了浮点数指数位所在字节相对于数据块的偏移量。
 因此在模型数据处理阶段，系统可以直接利用鉴别阶段的熵值分析结论，针对性地提取低熵值字节组并进行压缩，从而提高压缩效率。
 相对于盲目地对所有组进行压缩，该方法对32位数据块缩减了75\%的压缩输入，对16位数据块缩减了50\%的压缩输入。
@@ -142,28 +135,28 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.3.1.drawio.pdf}
-    \caption{定长切块边界偏移问题示意图}
+    \bicaption{定长切块边界偏移问题示意图}{Fixed-length chunk boundary offset problem diagram}
     \label{fig:boundary_offset}
 \end{figure}
 
-定长切块会带来边界偏移问题。传统数据（如文本、日志、代码等）常常在修改（如插入、删除或替换字符）后得到另一份副本，二者间常常仅在中间存在少量变化，而大部分内容保持不变，如图4.5所示。
+定长切块会带来边界偏移问题。传统数据（如文本、日志、代码等）常常在修改（如插入、删除或替换字符）后得到另一份副本，二者间常常仅在中间存在少量变化，而大部分内容保持不变，如图~\ref{fig:boundary_offset}所示。
 但在定长切块中，即使仅在中间插入或删除少量数据（图中加粗斜体），后续所有切块的边界都会发生偏移，如图中黄色部分，导致无法匹配到重复块。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.3.1.1.drawio.pdf}
-    \caption{变长切块解决边界偏移问题示意图}
+    \bicaption{变长切块解决边界偏移问题示意图}{Variable-length chunking solves boundary offset problem diagram}
     \label{fig:variable_length_chunking}
 \end{figure}
 
-基于内容定义的变长切块方法可以有效解决边界偏移问题，通过内容哈希确定切块边界，使得插入或删除数据后，未受影响的内容仍能被正确切分为相同的数据块，从而实现重复数据的识别与去除，如图4.6所示。
+基于内容定义的变长切块方法可以有效解决边界偏移问题，通过内容哈希确定切块边界，使得插入或删除数据后，未受影响的内容仍能被正确切分为相同的数据块，从而实现重复数据的识别与去除，如图~\ref{fig:variable_length_chunking}所示。
 
 
 \subsubsection{变长切块带来的子块划分挑战}
 变长切块解决了边界偏移问题，但也带来了子块划分的挑战。
 
 变长切块得到的数据块长度不一，若简单地将数据块按固定份数均分，则无法保证
-子块大小的一致性，难以匹配冗余区域，如图4.7所示，相似数据块仅有红色区域有修改，但均分子块无法匹配。
+子块大小的一致性，难以匹配冗余区域，如图~\ref{fig:fixed_length_chunking}所示，相似数据块仅有红色区域有修改，但均分子块无法匹配。
 
 若采用定长子块划分方法，则会在块内产生新的边界偏移问题，且该定长可能并不适合各种长度的变长块。
 
@@ -173,7 +166,7 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.3.2.drawio.pdf}
-    \caption{固定份数为3的子块划分示意图}
+    \bicaption{固定份数为3的子块划分示意图}{Fixed partitioning into 3 sub-blocks diagram}
     \label{fig:fixed_length_chunking}
 \end{figure}
 \subsubsection{指数取整的双向子块定长切分方法}
@@ -181,10 +174,10 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 
 基于上述考量，本文提出了一种指数取整的双向子块定长切分方法，以高效划分变长数据块为定长子块，同时缓解边界偏移问题。
 
-具体而言，系统首先根据该变长数据块长度，计算出最接近且不大于数据块长度1/10的2的幂次方，作为该块的子块长度。在大小相近的相似块中，该子块长度为相同的定值，避免了类似图4.7中的问题。
+具体而言，系统首先根据该变长数据块长度，计算出最接近且不大于数据块长度1/10的2的幂次方，作为该块的子块长度。在大小相近的相似块中，该子块长度为相同的定值，避免了类似图~\ref{fig:fixed_length_chunking}中的问题。
 同时，在不同数据块间，由于该子块长度适应性地设定为2的幂次方，能够较好地适应不同长度的数据块，避免过大或过小的子块划分。
 
-然后，系统从数据块的起始位置和结束位置分别向中间方向，以该子块长度进行定长切分，得到若干子块，并计算其哈希指纹作为特征。在相似块的冗余匹配过程中，也同时进行双向特征值匹配，如图4.8所示。
+然后，系统从数据块的起始位置和结束位置分别向中间方向，以该子块长度进行定长切分，得到若干子块，并计算其哈希指纹作为特征。在相似块的冗余匹配过程中，也同时进行双向特征值匹配，如图~\ref{fig:exponential_rounding_chunking}所示。
 根据burst等的相关研究，相似块的修改通常集中在中间的一段连续区域。因此，这种双向的切分方法，能够在一定程度上缓解边界偏移问题，因为即使数据块在中间部分发生了插入或删除，
 双向匹配仍能识别相同子块，从而识别出连续冗余区域。
 
@@ -192,7 +185,7 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/4.3.3.3.drawio.pdf}
-    \caption{指数取整的双向子块定长切分方法示意图}
+    \bicaption{指数取整的双向子块定长切分方法示意图}{Exponential rounding bidirectional sub-block fixed-length segmentation method diagram}
     \label{fig:exponential_rounding_chunking}
 \end{figure}
 
@@ -231,12 +224,12 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 
 
 \subsubsection{多级索引缓存策略}
-为了应对细粒度去重带来的额外索引查找开销，系统采用了多层次的索引缓存策略如图所示，以提升索引查找效率，减少对底层存储的随机访问次数与延迟。
+为了应对细粒度去重带来的额外索引查找开销，系统采用了多层次的索引缓存策略如图~\ref{fig:multi_level_index_cache}所示，以提升索引查找效率，减少对底层存储的随机访问次数与延迟。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1.1\textwidth]{../figures/缓存索引时序图.png}
-    \caption{多级索引缓存下的匹配查找时序图}
+    \bicaption{多级索引缓存下的匹配查找时序图}{Multi-level index cache matching lookup timing diagram}
     \label{fig:multi_level_index_cache}
 \end{figure}
 
@@ -264,12 +257,12 @@ zipNN等方法选择对所有组进行压缩，引入了对非冗余高熵组的
 
 \subsection{数据块重构}
 
-系统对数据块结构进行了调整，以增加新的元信息以指示解压/解码方式，存储细粒度信息，如图4.9所示。
+系统对数据块结构进行了调整，以增加新的元信息以指示解压/解码方式，存储细粒度信息，如图~\ref{fig:data_block_structure}所示。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{../figures/数据块结构.drawio.pdf}
-    \caption{数据块结构示意图}
+    \bicaption{数据块结构示意图}{Data block structure diagram}
     \label{fig:data_block_structure}
 \end{figure}
 
@@ -278,7 +271,7 @@ block type字段表示数据块的类型（如唯一块UNIQUE、重复块DEDUP�
 container id字段表示数据块所在的容器标识，数据块在容器内的偏移位置由容器元数据管理。
 fingerprint字段表示数据块的哈希指纹，用于唯一标识数据块内容。features字段只在数据块类型为MATCH时生效，
 在用于存储细粒度特征信息，即存储两个指向双向子块特征数组的指针。ref info字段存储冗余差分信息，包含基准块id，以及基准块子块特征与本数据块的匹配情况，
-以图4.8距离，记录匹配子块索引为1，2，-1（负值表示反向子块索引），具体的子块偏移量可以通过子块大小和子块索引计算得到，
+以图~\ref{fig:exponential_rounding_chunking}举例，记录匹配子块索引为1，2，-1（负值表示反向子块索引），具体的子块偏移量可以通过子块大小和子块索引计算得到，
 子块大小可按4.3.3.3中计算方法，由size字段得到。model info字段只在数据块类型为MODEL时生效，存储模型数据的熵值分析结论，即低熵值字节组的索引。
 正值表示16位浮点数的指数位组索引为modelinfo和modelinfo+2，负值表示32位浮点数的指数位组索引为 -model info。compress type表示去重后数据的
 压缩方法和预期的解压缩方法，默认为0，表示ZSTD压缩，其他值可扩展为其它压缩算法。
@@ -289,7 +282,7 @@ fingerprint字段表示数据块的哈希指纹，用于唯一标识数据块内
 
 \subsection{数据去重流水线并行}
 为了提升系统的整体处理性能，本文在整个端到端流程中引入了流水线并行的处理方式。
-具体实现方式参考图3.9，图中每个蓝色圆角矩形表示一个处理阶段，每个阶段都由不同的线程并行处理，线程间的数据通信通过全局队列实现。
+具体实现方式参考图~\ref{fig:pipeline_parallelism}，图中每个蓝色圆角矩形表示一个处理阶段，每个阶段都由不同的线程并行处理，线程间的数据通信通过全局队列实现。
 
 具体而言，读取（read）线程把待存储数据源分割为数据流，并推入read queue，然后下一阶段并行消费。
 
@@ -312,7 +305,7 @@ fingerprint字段表示数据块的哈希指纹，用于唯一标识数据块内
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/流水线并行.png}
-    \caption{数据去重流水线并行时序图}
+    \bicaption{数据去重流水线并行时序图}{Data deduplication pipeline parallelism timing diagram}
     \label{fig:pipeline_parallelism}
 \end{figure}
 
