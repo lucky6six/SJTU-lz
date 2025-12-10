@@ -1,0 +1,169 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2">
+  <diagram name="第 1 页" id="VZQf3i7vtWBKR9mR1pFG">
+    <mxGraphModel dx="788" dy="701" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="qgRi0VCLcSAkDDhD955X-6" value="计" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="250" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-7" value="科" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="250" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-8" value="算" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="250" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-9" value="机" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="250" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-10" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="250" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-16" value="计" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="290" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-17" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="290" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-18" value="算" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="290" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-19" value="机" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="290" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-20" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="290" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-55" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="qgRi0VCLcSAkDDhD955X-26" target="qgRi0VCLcSAkDDhD955X-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-26" value="KV store" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="810" y="110" width="330" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-38" value="index buffer" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="360" y="160" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-40" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="455" y="190" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-41" value="物" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="375" y="190" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-42" value="理" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="415" y="190" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.005;entryY=0.335;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="qgRi0VCLcSAkDDhD955X-26">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="210" as="sourcePoint" />
+            <mxPoint x="710" y="280" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="808" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-43" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="495" y="190" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-44" value="memory cache" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="375" y="320" width="330" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-56" value="container_buffer" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="409" y="10" width="221" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-67" value="机" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="940" y="270" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-68" value="计" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="270" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-69" value="算" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="270" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-70" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="980" y="270" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-71" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="270" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-76" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="580" y="220" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-72" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-76">
+          <mxGeometry x="50" width="25" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-73" value="物" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-76">
+          <mxGeometry width="25" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-74" value="理" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-76">
+          <mxGeometry x="25" width="25" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-75" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-76">
+          <mxGeometry x="75" width="25" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-77" value="fetch" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="705" y="458" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-82" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="150" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-83" value="数" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="150" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-84" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="150" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-85" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="150" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-86" value="计" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="419.5" y="40" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-87" value="算" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="459.5" y="40" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-88" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="210" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-89" value="化" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="210" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-90" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="210" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-91" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="210" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-92" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="360" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-93" value="化" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="360" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-94" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="360" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-95" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="360" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-101" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="720" y="410" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-96" value="机" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-101">
+          <mxGeometry x="64" width="32" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-97" value="计" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-101">
+          <mxGeometry width="32" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-98" value="算" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-101">
+          <mxGeometry x="32" width="32" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-99" value="学" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-101">
+          <mxGeometry x="96" width="32" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qgRi0VCLcSAkDDhD955X-100" value="院" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="qgRi0VCLcSAkDDhD955X-101">
+          <mxGeometry x="128" width="32" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
