@@ -10,22 +10,22 @@
 \begin{enumerate}
     \item \textbf{对模型数据的去重效果不佳}：传统去重系统依赖字节级别的精确匹配来识别冗余。然而，
     AI 模型文件普遍存在数值冗余，即不同数据块在数值上高度相似但字节表示上存在细微差异。
-    这种特性使得传统系统难以通过简单的指纹比对有效识别此类冗余，导致去重率大幅下降。如图~\ref{fig:b}所示，
-    在一个包含文件数据（非模型）与 Transformer 模型 checkpoints（模型）的混合负载下，开源块级去重系统 Destor 
-    结合 Zstd 压缩算法的去重率\footnote{去重率 = 存储数据原始大小 / 去重压缩后大小}随着模型数据占比的增加而显著降低。当模型数据占比达到 100\% 时，去重率几乎降至 1，直观地暴露了其在处理模型数值冗余方面的短板。
+    这种特性使得传统系统难以通过简单的指纹比对有效识别此类冗余，导致数据缩减率大幅下降。如图~\ref{fig:b}所示，
+    在一个包含文件数据（非模型）与 Transformer 模型 checkpoints（模型）的混合负载下，开源块级去重系统 Destor
+    结合 Zstd 压缩算法的数据缩减率\footnote{数据缩减率 = 存储数据原始大小 / 去重压缩后大小}随着模型数据占比的增加而显著降低。当模型数据占比达到 100\% 时，数据缩减率几乎降至 1，直观地暴露了其在处理模型数值冗余方面的短板。
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.8\textwidth]{../figures/系统去重率随模型数据比例变化情况.pdf}
-        \bicaption{系统去重率随模型数据比例变化情况}{Deduplication rate variation with model data proportion}\label{fig:b}
+        \includegraphics[width=0.8\textwidth]{../figures/系统数据缩减率随模型数据比例变化情况.pdf}
+        \bicaption{系统数据缩减率随模型数据比例变化情况}{Deduplication rate variation with model data proportion}\label{fig:b}
     \end{figure}
 
-    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在分块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:c}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，Destor 系统的去重率随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
+    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在分块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:c}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，Destor 系统的数据缩减率随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/系统去重率随数据块平均大小变化情况.pdf}
-    \bicaption{系统去重率随数据块平均大小变化情况}{deduplication rate variation with average data block size}
+    \includegraphics[width=0.8\textwidth]{../figures/系统数据缩减率随数据块平均大小变化情况.pdf}
+    \bicaption{系统数据缩减率随数据块平均大小变化情况}{deduplication rate variation with average data block size}
     \label{fig:c}
 \end{figure}
 
