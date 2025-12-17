@@ -24,7 +24,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.1.1.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0401比特粒度实现的复杂性.drawio.pdf}
     \bicaption{比特粒度实现的复杂性}{Complexity of bit-level implementation}\label{fig:bitwise_complexity}
 \end{figure}
 
@@ -36,7 +36,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.1.2.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0402模型浮点数的表示形式.drawio.pdf}
     \bicaption{模型浮点数的表示形式}{Representation of model floating-point numbers}\label{fig:float_representation}
 \end{figure}
 
@@ -48,7 +48,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.1.3.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0403字节粒度的分组抽样熵值分析.drawio.pdf}
     \bicaption{字节粒度的分组抽样熵值分析}{Byte-wise grouped sampling entropy analysis}\label{fig:bytewise_entropy}
 \end{figure}
 
@@ -67,7 +67,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.2.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0404基于熵值分析的字节分组压缩.drawio.pdf}
     \bicaption{基于熵值分析的字节分组压缩}{Byte-wise grouped compression based on entropy analysis}\label{fig:byte_group_compression}
 \end{figure}
 
@@ -79,7 +79,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.3.1.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0405定长切块的边界偏移问题.drawio.pdf}
     \bicaption{定长切块的边界偏移问题}{Boundary offset problem in fixed-length chunking}\label{fig:boundary_offset}
 \end{figure}
 
@@ -87,7 +87,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.3.1.1.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0406变长切块解决边界偏移问题.drawio.pdf}
     \bicaption{变长切块解决边界偏移问题}{Variable-length chunking solves the boundary offset problem}\label{fig:variable_length_chunking}
 \end{figure}
 
@@ -97,7 +97,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.3.2.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0407固定份数为 3 的子块划分.drawio.pdf}
     \bicaption{固定份数为 3 的子块划分}{Sub-block division into 3 fixed parts}\label{fig:fixed_length_chunking}
 \end{figure}
 
@@ -109,7 +109,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/4.3.3.3.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0408指数取整的双向子块定长切分方法.drawio.pdf}
     \bicaption{指数取整的双向子块定长切分方法}{Exponential rounding bidirectional sub-block fixed-length segmentation method}\label{fig:exponential_rounding_chunking}
 \end{figure}
 
@@ -136,7 +136,7 @@
 为了应对细粒度去重带来的额外索引查找开销，系统采用了多层次的索引缓存策略，如图~\ref{fig:multi_level_index_cache}所示，以提升索引查找效率，减少对底层存储的随机访问次数与延迟。
 \begin{figure}[htbp]
     % \centering
-    \includegraphics[width=1.4\textwidth]{../figures/0409.pdf}
+    \includegraphics[width=1.4\textwidth]{../figures/0409多级索引缓存下的匹配查找时序.pdf}
     \bicaption{多级索引缓存下的匹配查找时序}{Matching lookup timing with multi-level index cache}\label{fig:multi_level_index_cache}
 \end{figure}
 
