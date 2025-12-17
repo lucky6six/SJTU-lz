@@ -16,15 +16,15 @@
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.8\textwidth]{../figures/系统数据缩减率随模型数据比例变化情况.pdf}
+        \includegraphics[width=0.8\textwidth]{../figures/0301系统数据缩减率随模型数据比例变化情况.pdf}
         \bicaption{系统数据缩减率随模型数据比例变化情况}{Deduplication rate variation with model data proportion}\label{fig:b}
     \end{figure}
 
-    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在分块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:c}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，Destor 系统的数据缩减率随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
+    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在切块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:c}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，Destor 系统的数据缩减率随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/系统数据缩减率随数据块平均大小变化情况.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0302系统数据缩减率随数据块平均大小变化情况.pdf}
     \bicaption{系统数据缩减率随数据块平均大小变化情况}{deduplication rate variation with average data block size}
     \label{fig:c}
 \end{figure}
@@ -40,7 +40,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/模型文件中BF16浮点数各bit位熵值.pdf}
+    \includegraphics[width=0.8\textwidth]{../figures/0303模型文件中BF16浮点数各bit位熵值.pdf}
     \bicaption{模型文件中 BF16 浮点数各 bit 位熵值}{Bit entropy values of BF16 floating-point numbers in model files}\label{fig:d}
 \end{figure}
 
@@ -65,13 +65,13 @@
 
 系统的工作流程始于存储接口层。该层负责读取配置文件、调整系统参数，并接收来自上层应用的输入，
 将待存储文件转化为数据流暂存于数据缓冲区。数据首先经由传统的块级重复数据删除模块处理，该模块包含段管理器、
-文件结构缓存、哈希引擎及重复块查找器等核心组件，负责完成数据分块、指纹计算与初步的全局重复数据查找，
+文件结构缓存、哈希引擎及重复块查找器等核心组件，负责完成数据切块、指纹计算与初步的全局重复数据查找，
 其设计与主流工业实践保持一致，确保了系统的基础去重效能与兼容性。
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{../figures/细粒度冗余识别的重复数据删除系统总体架构.drawio.pdf}
-    \bicaption{细粒度冗余识别的重复数据删除系统总体架构}{overall architecture of fine-grained redundancy-aware deduplication system}
+    \includegraphics[width=0.9\textwidth]{../figures/0304细粒度冗余识别的数据缩减系统总体架构.drawio.pdf}
+    \bicaption{细粒度冗余识别的数据缩减系统总体架构}{overall architecture of fine-grained redundancy-aware deduplication system}
     \label{fig:FHRD_architecture}
 \end{figure}
 
@@ -93,7 +93,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{../figures/浮点数二进制.png}
+    \includegraphics[width=0.5\textwidth]{../figures/0305浮点数二进制.png}
     \bicaption{16 位浮点数二进制内容}{Binary representation of 16-bit floating-point numbers}\label{fig:float_binary}
 \end{figure}
 
@@ -147,7 +147,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{../figures/数据类型鉴别模块.drawio.pdf}
+    \includegraphics[width=0.9\textwidth]{../figures/0306数据类型鉴别模块.drawio.pdf}
     \bicaption{基于分组熵值分析的数据类型鉴别方法}{Data type classification method based on grouped entropy analysis}\label{fig:data_type_classification}
 \end{figure}
 
@@ -163,7 +163,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{../figures/模型数据处理模块.drawio.pdf}
+    \includegraphics[width=0.9\textwidth]{../figures/0307模型数据处理模块.drawio.pdf}
     \bicaption{模型数据处理模块}{Model data processing module}\label{fig:model_data_processing}
 \end{figure}
 
@@ -176,7 +176,7 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{../figures/非模型数据处理模块.drawio.pdf}
+    \includegraphics[width=0.9\textwidth]{../figures/0308非模型数据处理模块.drawio.pdf}
     \bicaption{非模型数据处理模块}{Non-model data processing module}\label{fig:non_model_data_processing}
 \end{figure}
 
@@ -187,11 +187,11 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{../figures/系统去重存储工作流.drawio.pdf}
+    \includegraphics[width=0.9\textwidth]{../figures/0309系统去重存储工作流.drawio.pdf}
     \bicaption{系统去重存储工作流}{System deduplication storage workflow}\label{fig:system_dedup_workflow}
 \end{figure}
 
-工作流始于\textbf{读取与分块}阶段。原始文件（例如，一个包含 AAA、BBB、CCC、DDD 和 MODEL\footnote{MODEL 部分数据段为模型数据，其余为非模型数据} 数据段的文件）被读入系统，数据流经由切块器分割为若干固定大小的数据块。此步骤将连续的数据流转化为离散的、易于管理的处理单元，为后续的精细化操作奠定基础。
+工作流始于\textbf{读取与切块}阶段。原始文件（例如，一个包含 AAA、BBB、CCC、DDD 和 MODEL\footnote{MODEL 部分数据段为模型数据，其余为非模型数据} 数据段的文件）被读入系统，数据流经由切块器分割为若干固定大小的数据块。此步骤将连续的数据流转化为离散的、易于管理的处理单元，为后续的精细化操作奠定基础。
 
 紧接着进入\textbf{块级去重}阶段。系统通过哈希引擎为每个数据块（如 AAAA、BBBB、CCCC、DDDD）计算唯一指纹，并查询全局指纹索引。此阶段旨在快速消除全局范围内完全一致的重复块。如图所示，数据块 AAAA 和 CCCC 的指纹在索引中被找到，因此被判定为重复块，系统仅保留指向已存储数据的元数据指针；而块 BBBB、DDDD 和 MODEL 块作为唯一块，则进入下一处理阶段。此环节显著减少了需要进一步处理的数据量。
 
