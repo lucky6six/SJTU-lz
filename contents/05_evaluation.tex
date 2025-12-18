@@ -1,0 +1,451 @@
+% !TEX root = ../main.tex
+
+\chapter{实验结果与分析}
+
+本章对本文提出的 FHRD 系统进行了全面的实验评估。其中 5.1 节介绍了实验环境与测试方法，说明了本章选用的对照系统及数据集。
+5.2 节展示了在不同混合类型工作负载下的去重效果和性能表现，并与其他相关工作进行了对比与分析。5.3 节通过对比消融实验，深入分析了类型鉴别模块、基于熵
+值分析结论的字节分组压缩方法和指数取整的双向子块定长切分方法等关键技术在不同类型负载下的实际效果，验证了各优化技术的优越性，以及系统在各种数据集上的适应情况。
+5.4 节通过控制混合负载比例和块大小等参数，深入探讨了这些因素对 FHRD 效果的影响，说明了本文优化对 3.1 节中所论述的现有云存储负载问题的解决效果。
+% 5.5节通过分阶段分析说明了各个子模块对整体系统数据缩减率的贡献和对时延的影响。最后，5.6节展示了FHRD在实际应用集成中的表现。
+\section{实验环境与测试方法}
+\subsection{实验环境}
+
+本章实验所使用的服务器配置如表~\ref{tab:config}所示。测试服务器配备了两个 AMD EPYC 7763 处理器，每个处理器拥有
+64 个物理核心。服务器配备有 128GB 的 DRAM、2 个 1TB 英特尔 SSDSC2KB9 型号的 SSD、5 个 16TB 的东芝
+MG08ACA 型号的 HDD。操作系统为 Ubuntu 24.04.2 LTS，内核版本为 6.14.0。
+
+\begin{table}[!hpt]
+    \bicaption{实验服务器配置}{Configuration of the experimental server}
+    \label{tab:config}
+    \centering
+    \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.20\linewidth}
+                                            >{\raggedright\arraybackslash}p{0.36\linewidth} @{}}
+        \toprule
+        配置项 & 配置内容 \\ \midrule
+        CPU &
+            2 $\times$ AMD EPYC 7763 (64 cores each) \\
+        DRAM & 4 $\times$ 32GB DDR4 RAM \\
+        磁盘 & 2 $\times$ 1TB SSD + 5 $\times$ 16TB HDD \\
+        操作系统 & Ubuntu 24.04.2 LTS (Kernel 6.14.0) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+
+
+\subsection{测试对照方案}
+
+本文在实验中设置了若干对照组，如表~\ref{tab:tested_schemes}所示。
+BASE 代表主流的传统方案：在开源系统 Destor 的基础上集成 ZSTD 压缩，体现当前工业界常用的变长切块 + 块级去重 + 通用压缩流水线。
+FHRD 为本文提出的方法，集成了块级去重基础上的数据类型鉴别、面向模型数据的字节分组编码与针对非模型数据的细粒度子块去重等改进。
+为评估优化技术的贡献，我们设计了消融对比（FHRD-1、FHRD-2）分别去除或替换关键子模块以量化其影响。
+
+另外，为了与已有细粒度或专用方法做对比，在非模型数据去重方面我们在系统中实现了 BURST 及其与变长切块结合的变体（BURST+），
+并将 ODESS（全局字节粒度增量压缩）纳入对照以代表理想化的增量压缩上界；需要指出的是，ODESS 在计算与内存开销上远高于
+在线云存储可接受的范围，因此更适合作为效果上界的衡量，而非直接可部署的在线方案。
+
+针对模型数据的专用编码压缩方法（如 ZIPNN、DIFFNN），为公平比较我们也实现了若干组合变体（ZIPNN+、ZIPNN++），以
+评估专用编码方法在与块级去重及变长切块流水线协同下的实际收益。
+\begin{table}[!hpt]
+    \bicaption{对照方案}{Comparison of the tested schemes}
+    \label{tab:tested_schemes}
+    \centering
+    \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.15\linewidth}
+                                            >{\raggedright\arraybackslash}p{0.50\linewidth} @{}}
+        \toprule
+        对照组 & 方案说明 \\ \midrule
+        BASE & 基础对照组，在开源系统 Destor 的基础集成 ZSTD 压缩算法，代表目前工业界主流的变长切块块级去重加通用压缩的传统方案。 \\\midrule
+        FHRD & 本文提出的面向混合负载的细粒度冗余识别的重复数据删除系统，设计实现参照第 3、4 章。 \\\midrule
+        FHRD-1 & FHRD 消融实验版本 1，模型处理模块去除基于熵值分析结论的字节分组压缩，改为全部压缩。 \\\midrule
+        FHRD-2 & FHRD 消融实验版本 2，非模型处理模块去除指数取整的双向子块定长切分方法，仅均分子块。 \\\midrule
+        BURST & 面向块内突发修改的去重系统，采用头尾指纹技术去除大块边缘冗余。 \\\midrule
+        BURST+ & BURST + 变长切块技术 \\\midrule
+        ODESS & 全局匹配的字节粒度增量压缩去重系统。\\\midrule
+        ZIPNN & 针对模型文件的编码去重系统。\\\midrule
+        ZIPNN+ & ZIPNN + 块级去重\\\midrule
+        ZIPNN++ & ZIPNN + 变长切块 + 块级去重\\\midrule
+        DIFFNN++ & 与 ZIPNN 原理类似，但具有文件级模型数据鉴别的编码去重系统，仅对模型文件进行编码压缩 + 变长切块 + 块级去重\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+
+
+\subsection{工作负载说明}
+
+本文实验负载选取了多种公开数据集，涵盖了典型的非模型数据和模型数据，
+用以评估系统在各种不同类型混合负载下的去重效果，并对比相关优化在不同数据集上的效果。
+
+此外，本文还设计了人工数据集dataset和训练数据集checkpoints，以便在定量实验中更精细地控制模型数据占比。
+
+具体数据集信息如表~\ref{tab:dataset}所示。
+
+
+\begin{table}[!hpt]
+    \bicaption{负载数据集}{Load datasets}
+    \label{tab:dataset}
+    \centering
+    \begin{threeparttable}
+        \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.15\linewidth}
+                                                >{\raggedright\arraybackslash}p{0.50\linewidth} >{\raggedright\arraybackslash}p{0.20\linewidth} @{}}
+            \toprule
+            数据集 & 数据简介 & 数据类别 \\ \midrule
+            backup & 多个版本的容器镜像文件。 & 非模型数据 \\ \midrule
+            vmi \tnote{a} & 多个版本的虚拟机镜像文件。 & 非模型数据 \\ \midrule
+            code \tnote{b} & 多个版本的开源工具（gcc、gdb等）源代码文件。 & 非模型数据 \\ \midrule
+            lnx-ker \tnote{c} & 多个版本的Linux内核源码文件。 & 非模型数据 \\ \midrule
+            lnx-tar & 多个版本的Linux发行版tar包文件。 & 非模型数据 \\ \midrule
+            gzip & 多个版本的gzip压缩文件。 & 非模型数据 \\ \midrule
+            webh & 多个日期的某学校网页文件，包含大量HTML、CSS和JavaScript格式的网页内容。 & 非模型数据 \\ \midrule
+            dataset & 由随机内容文件经过多次随机修改生成的，包含多个版本的人工数据集，便于定量分析。 & 非模型数据 \\ \midrule
+            \midrule
+            checkpoints & transformer模型训练产生的多版本检查点文件，模型大小由人工控制，便于定量分析。 & 模型数据 \\\midrule
+            model16 \tnote{d}& 16 位浮点数格式的 Qwen3 模型切片  & 模型数据 \\ \midrule
+            modelQ4 \tnote{e} & Q4 量化格式的 Gemma-3 模型切片  & 无冗余模型数据 \\ \midrule
+            mixQ4FP32 \tnote{f} & 混合量化格式模型切片，GPT-OSS-120 模型为主。 & 混合模型数据 \\\midrule
+            no-normal & 非经典后缀名的模型数据。 & 非典型模型数据 \\\midrule
+            tarmodel & 含有模型文件的tar包。 & 非典型模型数据 \\\midrule
+            dockermodel & 含有模型文件的docker镜像文件。 & 非典型模型数据 \\
+            \bottomrule
+        \end{tabular}
+        \begin{tablenotes}
+        \item [a] \texttt{\detokenize{https://cn.ubuntu.com/download/server}}
+        \item [b] \texttt{\detokenize{https://ftp.gnu.org/gnu/gcc}}
+        \item [c] \texttt{\detokenize{https://www.kernel.org}}
+        \item [d] \texttt{\detokenize{www.modelscope.cn/models/Qwen/Qwen3-32B}}
+        \item [e] \texttt{\detokenize{www.modelscope.cn/models/AI-ModelScope/gemma-3-4b-it-qat-q4_0-gguf}}
+        \item [f] \texttt{\detokenize{www.modelscope.cn/models/openai-mirror/gpt-oss-120b}}
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
+\subsection{测试方法及指标}
+
+本章中，由 5.1.3 节中的一种数据集或多种数据集混合构成不同工作负载，
+作为待存储数据，经由 5.1.2 节中的各种对照组系统进行去重，得到各对照组的去重效果，具体指标包括：
+
+1. 数据缩减率：衡量系统在处理不同类型数据时，成功去除冗余数据的比例，由以下公式计算，数据缩减率越高，效果越好：
+   \[
+   \text{数据缩减率} = \frac{\text{原始数据量}}{\text{去重压缩后数据量}}
+   \]
+
+2. 吞吐量：评估系统在进行去重操作时的响应时间和处理速度，由以下公式计算，吞吐量越高，效果越好：
+    \[
+    \text{吞吐量} = \frac{\text{处理的总数据量}}{\text{处理时间}}
+    \]
+
+
+
+\section{基准实验}
+为模拟云存储任务的混合负载场景，本节实验将 5.1.3 节中所述的若干模型数据与非模型数据混合，构成具有代表性的工作负载。
+我们在 5.1.2 节中所述的各个实验对象上分别运行存储任务，直至去重、压缩与持久化流程完全结束。通过精确记录存储前后数据量的变化和任务总执行时间，
+我们计算出各方案的任务数据缩减率和吞吐量，旨在深入对比和分析在当前云存储环境下，FHRD 相较于其他现有工作的实际效果与性能差异。
+
+% 由于不同负载类型的去重效果差异较大，本章实验结果相较于base组进行了归一化处理，以便更清晰直观地展
+% 示各方案在不同负载下的效果.
+
+
+\subsection{数据缩减率}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0501各类混合负载下数据缩减率对比.pdf}
+    \bicaption{各类混合负载下数据缩减率对比}{Comparison of deduplication rates under various mixed workloads}
+    \label{fig:5.2.1}
+\end{figure}
+
+
+如图~\ref{fig:5.2.1} 所示，我们展示了各类混合负载下不同方案的数据缩减率对比结果。从图中可以观察到几个关键现象：
+\begin{itemize}
+    \item ZIPNN、ZIPNN+ 和 BURST 的表现在所有测试中均不理想，其数据缩减率甚至在部分数据集中低于基准方案 BASE（变长切块 + 块级去重 + 通用压缩）。这一结果有力地揭示了变长切块（Variable-Size Chunking）在现代去重流水线中的核心地位。缺少变长切块，系统无法有效识别和消除由数据插入、删除或修改引起的偏移（Shift）问题，导致大量冗余数据块因边界变化而无法被识别，从而严重影响了去重效率。
+    \item 以 ZIPNN++ 和 DIFFNN++ 为代表的方案，在 BASE 的基础上集成了针对模型数据的专用处理能力。这使得它们在处理包含模型数据的混合负载时，相较于 BASE 能取得约 6.5\% 至 10.1\% 的数据缩减率提升，证明了模型数据专用优化的价值。
+    \item 以 BURST+ 和 ODESS 为代表的方案，它们在 BASE 的基础上引入了对块内冗余（Intra-Chunk Redundancy）的处理能力。BURST+ 通过优化数据块的边缘冗余，ODESS 则通过全局字节级增量压缩，分别实现了 5.2\% 和 14.1\% 的平均数据缩减率提升。这表明，随着数据块尺寸的增大和数据内容的日趋复杂，块内冗余已成为不可忽视的优化对象。
+    \item 本文提出的 FHRD 在所有测试负载下均表现出最优的数据缩减率。FHRD 不仅集成了对模型数据和非模型数据的双重优化，还通过更精细的冗余识别策略，有效地应对了现代云存储中的复杂数据构成。其平均数据缩减率相较于 BASE 提高了 21.7\%。这一结果初步验证了 FHRD 在处理多样化、大规模混合负载时的综合优势。
+\end{itemize}
+
+
+\subsection{吞吐量}
+
+
+如图~\ref{fig:5.2.2} 所示是各类混合负载下吞吐量的对比结果。可以看到，所有引入了额外优化步骤的方案，由于增加了更为细粒度的处理流程，
+其整体吞吐量相较于简洁的 BASE 方案均有不同程度的下降。
+
+其中，ODESS 作为增量压缩方法的理论上界代表，其性能表现最差。这是因为它需要在全局范围内进行滚动哈希特征提取、相似性搜索以及字节级的差分计算，这
+些操作带来了巨大的计算和I/O开销。其吞吐量仅为 BASE 方案的 15.3\%，下降幅度之大，说明此类高精度但高消耗的方案难以直接部署于要求高响应速度的在线云存储（Online Cloud Storage）环境中。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0502各类混合负载下吞吐量对比.pdf}
+    \bicaption{各类混合负载下吞吐量对比}{Comparison of throughput under various mixed workloads}
+    \label{fig:5.2.2}
+\end{figure}
+相比之下，ZIPNN++, BURST+ 和 FHRD 等方案在吞吐量上虽有下降，但其性能损失仍在可接受范围内，展现了较好的实用性。具体来看，三者的吞吐量保持在 BASE 方案的 80\%以上。结合图~\ref{fig:5.2.1}的数据缩减率结果，
+我们可以观察到一个宏观趋势：去重效果越精细，性能开销越大。这一方面源于更细粒度的冗余处理（如块内去重、模型编码）本身带来的额外计算开销；
+另一方面，这也与通用压缩算法（如ZSTD）的特性相关——当输入数据的冗余度更高（即可压缩性更强）时，压缩算法需要消耗更多时间来查找和编码重复模式，从而导致处理速度下降。
+
+综合 5.2 节的实验结果，我们可以得出以下结论：单纯基于定长切块的优化方案（如 ZIPNN, BURST）已无法满足现代复杂负载的需求，
+因此在后续的实验中，我们将重点与它们的变长切块优化版本进行比较。同时，尽管 ODESS 在去重效果上表现优异，但其过高的性能开销使其不具备在线应用的可行性，
+后续我们仅将其作为衡量去重效果的理想上界进行参考和讨论。
+
+
+\section{系统优化效果分析}
+基准实验初步验证了 FHRD 在混合负载下的整体有效性。为深入探究其内部关键技术的具体贡献，
+本节将通过一系列消融实验和对比分析，对第四章提出的各项优化——包括类型鉴别模块、基于熵值分析的字节分组压缩以及指数取整的双向子块定长切分方法——进行逐一剖析。
+为此，我们设计了两种 FHRD 的消融版本：FHRD-1 和 FHRD-2（具体定义见表~\ref{tab:tested_schemes}），旨在量化评估每个模块在不同场景下的实际效果与性能影响。
+
+
+\subsection{类型鉴别效率分析}
+本节首先对数据类型鉴别方法的性能表现进行评估。在 FHRD 的设计中，类型鉴别的核心目标是准确识别出那些具有规律字节熵、适合采用专用编码处理的数据块。
+因此，我们将“模型数据块”操作性地定义为：能够通过 4.3 节所述的编码压缩方法实现 10\% 以上空间节省的数据块。这个标准将作为我们评估类型鉴别准确性的基准。
+
+实验中，我们对比了三种不同的鉴别方法在多个典型模型数据集上的表现：
+\begin{enumerate}
+    \item \textbf{文件级（File-level）}：基于文件后缀名（如 \texttt{.pt}, \texttt{.safetensors}）进行识别的传统方法。
+    \item \textbf{比特级（Bit-level）}：基于数据块的比特粒度熵值分析进行判断。
+    \item \textbf{字节级（Byte-level）}：本文提出的基于数据块的字节粒度熵值分析进行判断。
+\end{enumerate}
+我们采用正确率、误报率和漏检率这三个关键指标来全面衡量它们的准确性。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0503类型鉴别准确率对比.pdf}
+    \bicaption{类型鉴别准确率对比}{Comparison of type identification accuracy}
+    \label{fig:5.3.1.1}
+\end{figure}
+
+如图~\ref{fig:5.3.1.1} 所示是三种鉴别方法的正确率对比结果，可见字节级和比特级的鉴别正确率在各种数据集上均能达到 98\% 以上，且二者鉴别效果基本相同，差距在 0.02\% 以内。而
+文件级在部分数据集（如 model16）上能够取得较高的正确率，在其他数据集上正确率明显低于前两者。
+
+
+
+
+
+
+为深入探究正确率差异的根源，我们进一步分析了各方法的误报率和漏检率，如图~\ref{fig:5.3.1.2} 和图~\ref{fig:5.3.1.3} 所示。文件级方法的问题主要体现在两个方面：
+\begin{itemize}
+    \item \textbf{高误报率}：在 \texttt{modelQ4} 这类以量化模型为主的数据集上，文件级方法仅凭后缀名就将许多已经过量化、熵值较高、不具备压缩潜力的数据块错误地判断为“可压缩”的模型数据，导致了较高的误报率。
+    \item \textbf{高漏检率}：在 \texttt{dockermodel} 这类非典型模型数据集上，由于模型数据被封装在容器镜像等复杂结构中，或使用了非常规的后缀名，文件级方法无法有效识别，导致大量模型数据被遗漏。
+\end{itemize}
+相比之下，字节级和比特级方法凭借对数据内容本身的分析，其误报率和漏检率始终保持在极低水平，展现了强大的场景适应性和鲁棒性。
+
+\begin{figure}[!htp]
+  \centering
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0504类型鉴别误报率对比.pdf}
+    \bicaption{类型鉴别误报率对比}{false positive rate}
+    \label{fig:5.3.1.2}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0505类型鉴别漏检率对比.pdf}
+    \bicaption{类型鉴别漏检率对比}{false negative rate}
+    \label{fig:5.3.1.3}
+  \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0506类型鉴别吞吐量对比.pdf}
+    \bicaption{类型鉴别吞吐量对比}{Comparison of type identification throughput}
+    \label{fig:5.3.1.4}
+\end{figure}
+
+最后，我们评估了这几种方法的时间开销。文件级方法的开销与文件数量相关，与数据总量关系不大，其耗时极低，几乎可以忽略不计。
+因此，我们重点对比了字节级和比特级方法的吞吐量，如图~\ref{fig:5.3.1.4} 所示。实验结果清晰地表明，字节级方法的吞吐量显著高于比特级方法，
+平均提升幅度达到 69.6\%（范围在 54.4\% 至 78.5\% 之间）。
+
+综合来看，尽管文件级方法速度最快，但其准确性严重不足，无法适应复杂的云存储环境。而在两种基于熵值的方法中，字节级方法在保持与比特级方法几乎同等高准确率的同时，
+大幅提升了处理效率。这一结果证明了 4.2 节所述的字节级熵值分析方法在准确性和性能之间取得了更优的平衡，是 FHRD 系统中理想的数据类型鉴别方案。
+
+
+\subsection{基于熵值分析结论的字节分组压缩效果分析}
+
+在验证了类型鉴别的有效性后，本节将深入评估 FHRD 针对模型数据的核心优化——基于熵值分析结论的字节分组压缩方法。我们将通过对比 FHRD、其消融版本 FHRD-1 以及专为模型数据设计的 ZIPNN++，来分析该方法在去重效果和性能开销上的综合表现。
+
+如图~\ref{fig:5.3.2} 所示，我们比较了这几种方案在不同模型数据集上的数据缩减率。实验结果揭示了以下几点：
+\begin{itemize}
+    \item \textbf{对于低冗余数据}：在 \texttt{modelQ4} 这类主要由量化模型构成的数据集上，所有方法的数据缩减率均不理想。这符合预期，因为量化过程本身就是一种信息压缩，其产生的数据冗余度极低，无论是通用压缩还是专用去重方法都难以进一步发掘空间节省潜力。
+    \item \textbf{对于高冗余模型数据}：在 \texttt{model16} 这类纯净的、未量化的模型数据集中，FHRD 的去重效果与专门为此类数据优化的 ZIPNN++ 基本持平（差距小于 1\%），证明了 FHRD 在处理其目标模型数据类型时，能够达到与专用工具相媲美的效率。
+    \item \textbf{对于混合负载}：在 \texttt{dockermodel} 这类包含了模型数据和少量非模型数据的混合场景中，FHRD 的去重效果明显优于 ZIPNN++。这凸显了 FHRD 作为一个综合性方案的优势：它不仅能处理模型数据，还能兼顾负载中的其他数据类型，从而在真实的复杂负载下获得更高的整体数据缩减率。
+\end{itemize}
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0507基于熵值分析结论的字节分组压缩效果对比.pdf}
+    \bicaption{基于熵值分析结论的字节分组压缩效果对比}{Comparison of byte-wise grouped compression effects based on entropy analysis conclusions}
+    \label{fig:5.3.2}
+\end{figure}
+
+
+此外，通过对比 FHRD 与其消融版本 FHRD-1（该版本对所有字节组进行压缩，而非选择性压缩），我们发现 FHRD 的数据缩减率并未下降，反而在多个数据集上略有提升。
+这看似有悖常理，但其背后原因是：FHRD-1 在尝试压缩那些本身不含冗余的字节组时，不仅无法减小数据体积，反而会因为增加了压缩元数据而引入额外的存储开销。
+FHRD 通过基于熵值分析结论的选择性压缩策略，精确地只对具有冗余的字节组（即熵值较低的组）进行压缩，从而避免了这种“无效压缩”带来的负面影响。
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0508压缩线程吞吐量对比.pdf}
+    \bicaption{压缩线程吞吐量对比}{Comparison of compression thread throughput}
+    \label{fig:5.3.2.2}
+\end{figure}
+
+为了进一步验证该方法在节省计算资源方面的优势，我们测量了压缩线程的吞吐量，如图~\ref{fig:5.3.2.2} 所示。实验数据显示，ZIPNN++ 和 FHRD-1 的压缩吞吐量均低于基准的 BASE 方案。
+这是因为它们的编码优化使得输入到 ZSTD 压缩器的数据更具可压缩性，而 ZSTD 在处理高度可压缩数据时需要消耗更多计算资源来查找匹配项，导致速度变慢。
+
+相比之下，FHRD 的表现则完全不同。通过其字节分组压缩策略，FHRD 在处理以 16 位浮点数为主的模型数据时，理论上可以将送入压缩算法的数据量减少一半（只压缩高位字节组）。
+实验结果也证实了这一点：FHRD 的压缩吞吐量相较于 FHRD-1 提升了约 80\%。
+吞吐量提升未达到理论上的 100\%，同样是因为被压缩的冗余字节组（高位字节）具有高度可压缩性，其处理速度慢于非冗余字节组，从而对整体吞吐量产生了一定影响。
+
+综上所述，基于熵值分析的字节分组压缩方法，不仅在去重效果上不输于甚至略优于全量压缩，更重要的是，它通过避免无效计算，显著提升了压缩阶段的吞吐量，有效降低了系统的整体计算开销。
+这充分证明了 4.3 节所述方法在平衡去重效果与系统性能方面的优越性。
+
+
+
+\subsection{指数取整的双向子块定长切分方法效果分析}
+
+本节将聚焦于 FHRD 针对非模型数据的优化——“指数取整的双向子块定长切分方法”，旨在阐明其在处理块内冗余方面的技术优势。
+
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0509非模型数据数据缩减率对比.pdf}
+    \bicaption{非模型数据数据缩减率对比}{Comparison of non-model data deduplication rates}
+    \label{fig:5.3.3}
+\end{figure}
+
+图~\ref{fig:5.3.3} 展示了 FHRD、其消融版本 FHRD-2，以及 BURST+ 在多种非模型数据集上的数据缩减率对比。
+\begin{itemize}
+    \item \textbf{整体趋势分析}：从宏观上看，FHRD 的数据缩减率在所有数据集上均显著高于 FHRD-2，提升范围在 7.4\% 至 10.3\% 之间，平均高出 8.9 个百分点，这直接证明了“指数取整”这一核心思想的有效性。与简单的均分子块相比，指数取整能够更智能地划分数据，从而识别出更多隐藏的冗余。同时，FHRD 和 FHRD-2 的数据缩减率都一致优于 BURST+，平均分别高出 13.5\% 和 4.6\%，这是因为 BURST+ 的优化策略局限于数据块的首尾区域，未能充分挖掘块内部存在的冗余。最后，这三种细粒度优化方法的数据缩减率都高于基准的 BASE 组，再次凸显了在现代数据存储中，处理块内冗余对于提升整体去重效率的普遍重要性。
+\end{itemize}
+
+
+
+\begin{itemize}
+    \item \textbf{分数据集细化分析}：
+    \begin{itemize}
+        \item 在 \texttt{webh} 数据集上，各方法的数据缩减率差异不大。这是因为 \texttt{webh} 主要由大量小文件（HTML, CSS, JavaScript）组成，这些文件本身尺寸小，块内几乎不存在连续的大段冗余，因此细粒度去重的优化空间天然受限。
+        \item 在 \texttt{gzip} 数据集上，所有方法的数据缩减率都相对较低。这同样符合预期，因为 gzip 文件本身是经过压缩的，其内部冗余已被消除，后续任何去重方法都难以再获得显著的空间节省。
+        \item 在 \texttt{backup}、\texttt{code} 等数据集中，不同方法之间的数据缩减率差距被显著放大。在这些场景下，FHRD 的优势尤为突出，表明其“指数取整的双向子块定长切分”方法在处理包含大量版本迭代、代码复制、数据块移位等产生的块内冗余时，表现极为出色。
+    \end{itemize}
+\end{itemize}
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0510非模型数据吞吐量对比.pdf}
+    \bicaption{非模型数据吞吐量对比}{Comparison of non-model data throughput}
+    \label{fig:5.3.3.2}
+\end{figure}
+
+性能方面，参考图~\ref{fig:5.3.3.2} 的吞吐量数据，FHRD 的处理速度略低于 FHRD-2。这一下降是符合逻辑的，因为它反映了 FHRD 识别并处理了更多的块内冗余，这些额外的操作（如更多的子块切分、哈希计算和索引查找）自然会带来一定的计算开销。然而，值得注意的是，二者的吞吐量差距非常小，
+这表明 FHRD 的精细化切分策略在计算上是高效的，其带来的性能影响在实际应用中完全可以接受。
+
+
+为进一步剥离块级去重和通用压缩等因素的干扰，我们设计了更精细的实验，直接衡量不同方法在“相似块”检出和冗余去除上的核心能力。
+
+如图~\ref{fig:5.3.3.3} 所示，从全局相似块检出率来看，三种方法呈现出清晰的层级关系：FHRD 在所有数据集上均实现了最高的检出率，FHRD-2 次之，而 BURST+ 则始终最低（BASE 组的相似块检出率为 0）。这一结果精准地反映了各方法策略的精细度差异：
+\begin{itemize}
+    \item \textbf{FHRD}：其“指数取整双向子块定长切分”策略，极大地提升了在不同数据块中切分出相同（或相似）子块的概率，从而能够捕捉到最多隐藏的块内相似性。
+    \item \textbf{FHRD-2}：作为消融版本，其均匀切分逻辑虽然也能发现部分冗余，但由于无法保证在相似但略有偏移的数据块中切分出大小一致的子块，其相似块识别能力相比 FHRD 大打折扣。
+    \item \textbf{BURST+}：其优化焦点仅在数据块的边界，完全忽略了块内部的相似性，因此其检出率自然最低。
+\end{itemize}
+
+ \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0511相似块检出率对比.pdf}
+    \bicaption{相似块检出率}{Comparison of similar block detection rates}
+    \label{fig:5.3.3.3}
+\end{figure}
+
+不同数据集上的检出率差异进一步揭示了数据特性与算法的适配关系。在冗余度极高的 \texttt{backup} 数据集中，所有方法都表现不错，
+但 FHRD 仍以 0.552 的检出率拔得头筹，展现了其在高冗余场景下的极限挖掘能力。而在冗余度极低的 \texttt{vmi} 数据集中，
+尽管所有方法的检出率都低于 0.05，FHRD 依然以 0.042 的优势领先，证明其在低冗余场景下仍具备一定的优化潜力。
+最能体现 FHRD 优势的是 \texttt{code}、\texttt{lnx-ker} 和 \texttt{lnx-tar} 这类数据集。
+以 \texttt{lnx-ker} 为例，FHRD 的检出率（0.36）是 FHRD-2（0.18）的 2 倍，是 BURST+（0.032）的 11 倍之多。这是因为这类数据中包含了大量因代码复用、
+文件版本演进、模块化结构等产生的块内相似片段，这与 FHRD 的细粒度切分策略形成了完美匹配，使其强大的相似块识别能力得到了充分的发挥。
+
+
+
+更高的相似块检出率是实现更优去重效果的直接前提。如图~\ref{fig:5.3.3.4} 所示，在对已检出的相似块进行去重时，
+我们观察到一个有趣的现象：FHRD 的“相似块冗余数据缩减率”反而低于其他方法。这并非说明 FHRD 的去重能力更弱，
+恰恰相反，这正是其检出能力更强的体现。因为 FHRD 检出了其他方法无法发现的、冗余度相对较低的“困难”相似块。这些低冗余块的加入，
+虽然对总去重量有所贡献，但却拉低了平均数据缩减率的统计数值。相比之下，BURST+ 和 FHRD-2 因为只能检出那些冗余度极高、最容易处理的相似块，
+其计算出的平均数据缩减率自然更高。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0512相似块冗余数据缩减率对比.pdf}
+    \bicaption{相似块冗余数据缩减率}{Comparison of similar block redundancy deduplication rates}
+    \label{fig:5.3.3.4}
+\end{figure}
+
+综合本节所有实验结果，我们可以得出结论：“指数取整的双向子块定长切分方法”通过其创新的切分策略，能够以可接受的微小性能开销，换取相似块检出率的巨大提升。这种能力使得 FHRD 能够发现并消除更多传统方法无法触及的块内冗余，最终转化为显著的整体去重效果提升，充分证明了该方法在处理非模型数据冗余方面的实用性与先进性。
+
+
+
+\section{负载特点影响实验}
+前述实验充分证明了 FHRD 各项优化技术的独立有效性。本节将回归到第 3.1 节提出的云存储负载演进趋势，通过参数化实验，系统性地探讨混合负载比例和数据块大小这两个关键因素对 
+FHRD 及其他方案去重效果的影响。实验负载选用 \texttt{dataset} 和 \texttt{checkpoints}，因为这两个人工生成的数据集能让我们精确地控制模型数据的占比和版本间的差异。
+
+首先，我们来考察云存储负载的第一个变化趋势：工作负载中模型数据的比例日益增加。
+如图~\ref{fig:5.4.1} 所示，我们绘制了各系统数据缩减率随模型数据比例变化的曲线。
+\begin{itemize}
+    \item 对于专攻模型压缩的 ZIPNN++ 和 DIFFNN++，其去重效果与模型数据占比呈现明显的正相关。当模型数据占比为 0 时，它们的数据缩减率退化至与 BASE 方案相同，因为其优化模块没有被激活。
+    \item 相反，对于专攻块内冗余的 BURST+，其优势主要体现在非模型数据上。随着模型数据占比的增加，其去重效果逐渐下降，当模型数据占比达到 100\% 时，其数据缩减率同样退化至 BASE 水平。
+    \item FHRD 的表现则截然不同。得益于其内置的数据类型鉴别和混合优化策略，FHRD 能够动态地为不同类型的数据施加最合适的去重方法。它不仅结合了模型数据优化和块内冗余优化的优点，还通过更精细的算法进一步放大了这些优势。因此，在从 0\% 到 100\% 的整个模型数据占比范围内，FHRD 始终保持着最高的数据缩减率，展现了其在应对任意混合比例负载时的强大适应性和鲁棒性。
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0513数据缩减率随模型数据比例变化情况.pdf}
+    \bicaption{数据缩减率随模型数据比例变化情况}{Comparison of deduplication rates with varying model data proportions}
+    \label{fig:5.4.1}
+\end{figure}
+
+接下来，我们探讨云存储负载的第二个变化趋势：为了适应海量数据的存储和管理，数据块的平均大小越来越大。
+如图~\ref{fig:5.4.2} 所示，我们展示了各系统数据缩减率随块大小变化的趋势。
+\begin{itemize}
+    \item BASE 组的数据缩减率随着块大小的增加而显著下降。这揭示了传统变长切块去重的一个核心缺陷：块越大，因数据内容的小幅改动而导致整个块的哈希值发生变化的概率就越大，从而使得识别出完全相同的块变得更加困难，去重效率随之降低。
+    \item ZIPNN 由于完全不依赖块级去重，其数据缩减率基本不受块大小变化的影响。而其增强版 ZIPNN++，虽然在 BASE 的基础上增加了对唯一块的编码处理，提升了整体去重效果，但它并不能缓解大块尺寸对块级去重效率的负面冲击。其数据缩减率曲线的下降趋势与 BASE 类似，只是因为有 ZIPNN 的托底，其下降的下界更高。
+    \item BURST+ 通过处理块的首尾冗余，在一定程度上缓解了块大小增加带来的数据缩减率下降问题。尽管它缺乏对模型数据的处理能力，在小块径下其数据缩减率低于 ZIPNN++，但随着块大小的增加，其数据缩减率下降得更慢，在块大小达到 100KB 时成功反超了 ZIPNN++。
+    \item FHRD 在此项测试中再次展现了其设计的优越性。通过其细粒度块内冗余去重机制，FHRD 能够有效地从大尺寸数据块中挖掘出局部冗余，极大地缓解了块大小增加对数据缩减率的负面影响。同时，它还保留了对模型数据的强大处理能力。因此，在所有测试的块大小范围内，FHRD 均表现出最高的数据缩减率，相较于 BASE 组实现了 15.5\% (4KB) 至 38.4\% (128KB) 的显著提升。
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/0514数据缩减率随块大小变化情况.pdf}
+    \bicaption{数据缩减率随块大小变化情况}{Comparison of deduplication rates with varying block sizes}
+    \label{fig:5.4.2}
+\end{figure}
+
+综合本节实验，FHRD 不仅在处理不同比例的混合负载时表现出色，而且在应对日益增大的数据块尺寸趋势时也展示了强大的鲁棒性。
+这充分说明了本文提出的方法能够有效解决 3.1 节中所述的现代云存储负载演进带来的挑战。
+
+
+% \section{阶段分解实验}（分阶段的去重和时延）
+ 
+
+
+% \section{应用集成实验}
+
+\section{本章小结}
+本章通过一系列全面而深入的实验，对本文提出的 FHRD 系统进行了系统性的评估。
+\begin{itemize}
+    \item \textbf{基准性能评估}：初步的基准实验结果清晰地表明，在模拟真实云存储的各类混合负载下，FHRD 相较于现有的主流方案（BASE）、模型专用方案（ZIPNN++）以及细粒度去重方案（BURST+），均表现出最优的数据缩减率，初步验证了其在应对现代复杂数据负载时的综合优势。
+    \item \textbf{关键技术消融分析}：通过细致的消融实验，我们逐一剖析了 FHRD 内部各项关键技术的实际贡献：
+    \begin{itemize}
+        \item \textbf{类型鉴别模块}：实验证明，本文提出的基于字节熵的类型鉴别方法，在保持极高准确率的同时，显著提升了处理效率，在性能和精度之间取得了理想的平衡。
+        \item \textbf{字节分组压缩}：该方法通过智能地选择性压缩，不仅保证了对模型数据的高效去重，还通过避免无效计算，大幅提升了压缩吞吐量，降低了系统开销。
+        \item \textbf{指数取整双向子块切分}：此方法被证明能够以极小的性能代价，换取对块内冗余（尤其是在非模型数据中）识别能力的巨大提升，是 FHRD 实现高数据缩减率的关键。
+    \end{itemize}
+    \item \textbf{负载影响分析}：最后，通过对混合负载比例和块大小这两个关键参数进行扫描实验，我们发现 FHRD 不仅在各种数据混合比例下都能保持领先，而且能够有效抵抗因块尺寸增大而导致的去重效率衰减问题。
+\end{itemize}
+综上所述，本章的实验结果充分验证了 FHRD 作为一个整体设计的先进性，以及其各项核心优化技术的优越性。实验数据有力地证明，本文提出的方法能够有效应对当前云存储环境中数据日益混合化和块尺寸增大的挑战，实现了在复杂负载下的高效重复数据删除。
