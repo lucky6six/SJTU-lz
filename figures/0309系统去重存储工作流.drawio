@@ -288,9 +288,6 @@
         <mxCell id="-dNnWnHYOr91YhIEaplG-92" value="DDDD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;fontSize=15;fontStyle=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="717.5" y="928" width="50" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="-dNnWnHYOr91YhIEaplG-93" value="non-model blocks" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=20;fontStyle=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
-          <mxGeometry x="590" y="888.5" width="180" height="40" as="geometry" />
-        </mxCell>
         <mxCell id="-dNnWnHYOr91YhIEaplG-94" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=20;fontStyle=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="-dNnWnHYOr91YhIEaplG-95" target="-dNnWnHYOr91YhIEaplG-98" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
