@@ -1,0 +1,136 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="第 1 页" id="sHx_DfBvs3D4urDEM9jU">
+    <mxGraphModel dx="1048" dy="888" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-UEc3gWuQ_aQyNzpgtuY-1" value="系统新增编码流程" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=3;dashed=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;curveFitting=1;jiggle=2;verticalAlign=bottom;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="550" y="620" width="320" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-41" value="系统新增去重流程" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;dashed=1;strokeWidth=3;fontSize=20;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="550" y="200" width="320" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-40" value="传统数据缩减系统流程" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;dashed=1;strokeWidth=3;fontSize=20;fontStyle=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="190" y="200" width="330" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-30" target="SyDpbFkgnzRnrAFSgt7r-10" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-30" value="细粒度子块去重" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="595" y="360" width="170" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="360" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-2" value="" style="shape=note;size=20;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;rounded=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="335" y="110" width="50" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-3" value="" style="shape=note;size=20;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;rounded=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="328.75" y="100" width="50" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-4" value="&lt;span style=&quot;color: rgb(51, 51, 51); font-family: Helvetica; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; background-color: rgb(236, 236, 236); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;Files&lt;/span&gt;" style="shape=note;size=20;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;rounded=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="320" y="90" width="50" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-6" target="SyDpbFkgnzRnrAFSgt7r-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-6" value="数据读取" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="240" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-7" target="SyDpbFkgnzRnrAFSgt7r-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-7" value="数据切块" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="320" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-8" target="SyDpbFkgnzRnrAFSgt7r-9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-8" value="指纹哈希" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="400" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-9" target="SyDpbFkgnzRnrAFSgt7r-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-9" target="SyDpbFkgnzRnrAFSgt7r-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="539.8" y="277.2399999999999" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="360" y="560" />
+              <mxPoint x="510" y="560" />
+              <mxPoint x="510" y="277" />
+              <mxPoint x="680" y="277" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-9" value="匹配去重" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="480" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-10" target="SyDpbFkgnzRnrAFSgt7r-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-10" value="压缩" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="630" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-11" value="持久化存储" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="240" y="710" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-24" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-18" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="680" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-UEc3gWuQ_aQyNzpgtuY-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="SyDpbFkgnzRnrAFSgt7r-18" target="SyDpbFkgnzRnrAFSgt7r-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-18" value="模型数据分离" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="620" y="300" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-23" target="SyDpbFkgnzRnrAFSgt7r-29" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-23" value="细粒度子块切分" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="620" y="390" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-27" target="SyDpbFkgnzRnrAFSgt7r-10" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="680" />
+              <mxPoint x="660" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-27" value="模型编码" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="707" y="660" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-29" target="SyDpbFkgnzRnrAFSgt7r-32" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-29" value="细粒度特征提取" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="620" y="460" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-32" value="块内冗余去重" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="620" y="530" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-36" value="混合&lt;br&gt;非重复块" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="500" y="240" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-37" value="模型数据" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="750" y="290" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TRmShACuj1WJ24ryOSWN-1" value="" style="shape=curlyBracket;whiteSpace=wrap;html=1;rounded=1;labelPosition=left;verticalLabelPosition=middle;align=right;verticalAlign=middle;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="220" y="240" width="20" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="TRmShACuj1WJ24ryOSWN-2" value="传统去重流程" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;strokeWidth=2;fontSize=16;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="200" y="325" width="20" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
