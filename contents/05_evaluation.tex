@@ -56,7 +56,7 @@ FHRD 为本文提出的方法，在块级去重基础上集成了细粒度子块
                                             >{\raggedright\arraybackslash}p{0.50\linewidth} @{}}
         \toprule
         对照组 & 方案说明 \\ \midrule
-        BASE & 基础对照组，在开源系统 Destor 的基础集成 ZSTD 压缩算法，代表目前工业界主流的变长块级去重加通用压缩的传统方案。 \\\midrule
+        BASE & 基础对照组，在开源系统 Destor 的基础上集成 ZSTD 压缩算法，代表目前工业界主流的变长块级去重加通用压缩的传统方案。 \\\midrule
         FHRD & 本文提出的面向混合负载的细粒度冗余识别的去重系统，设计实现参照第 3、4 章。 \\\midrule
         FHRD-1 & FHRD 消融实验版本 1，模型处理模块去除基于熵值分析结论的字节分组压缩，改为全部压缩。 \\\midrule
         FHRD-2 & FHRD 消融实验版本 2，非模型处理模块去除指数取整的双向子块定长分块方法，仅均分子块。 \\\midrule
@@ -90,7 +90,7 @@ FHRD 为本文提出的方法，在块级去重基础上集成了细粒度子块
     \label{tab:dataset}
     \centering
     \begin{threeparttable}
-        \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.15\linewidth}
+        \begin{tabular}{@{} >{\raggedright\arraybackslash}p{0.15\linewidth}|
                                                 >{\raggedright\arraybackslash}p{0.50\linewidth} >{\raggedright\arraybackslash}p{0.20\linewidth} @{}}
             \toprule
             数据集 & 数据简介 & 数据类别 \\ \midrule
@@ -171,7 +171,7 @@ FHRD 为本文提出的方法，在块级去重基础上集成了细粒度子块
 \subsection{吞吐量}
 
 
-如图~\ref{fig:5.2.2} 所示是各类混合负载下吞吐量的对比结果。可以看到，所有引入了额外优化步骤的方案，由于增加了更为细粒度的处理流程，
+如图~\ref{fig:5.2.2} 所示为各类混合负载下吞吐量的对比结果。可以看到，所有引入了额外优化步骤的方案，由于增加了更为细粒度的处理流程，
 其整体吞吐量相较于简洁的 BASE 方案均有不同程度的下降。
 
 其中，ODESS 作为增量压缩方法的理论上界代表，其性能表现最差。这是因为它需要在全局范围内进行滚动哈希特征提取、相似性搜索以及字节级的差分计算，这
@@ -300,7 +300,7 @@ FHRD 为本文提出的方法，在块级去重基础上集成了细粒度子块
     \label{fig:5.3.1.1}
 \end{figure}
 
-如图~\ref{fig:5.3.1.1} 所示是三种鉴别方法的正确率对比结果，可见字节级和比特级的鉴别正确率在各种数据集上均能达到 98\% 以上，且二者鉴别效果基本相同，差距在 0.02\% 以内。而
+如图~\ref{fig:5.3.1.1} 所示为三种鉴别方法的正确率对比结果，可见字节级和比特级的鉴别正确率在各种数据集上均能达到 98\% 以上，且二者鉴别效果基本相同，差距在 0.02\% 以内。而
 文件级在部分数据集（如 model16）上能够取得较高的正确率，在其他数据集上正确率明显低于前两者。
 
 
