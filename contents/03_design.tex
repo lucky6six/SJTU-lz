@@ -8,25 +8,23 @@
 随着数据块大小的持续增长，以及模型数据在云存储中的比重日益增加，传统数据缩减系统在处理现代云存储工作负载时，其局限性愈发凸显。具体而言，传统系统主要面临以下挑战：
 
 \begin{enumerate}
-    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在分块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:c}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，
-    开源块级去重系统 Destor 的数据缩减率\footnote{数据缩减率 = 存储数据原始大小 / 去重压缩后大小}随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
+    \item \textbf{对大块数据的去重能力有限}：随着存储块平均大小的增加，数据块内部往往包含大量局部重复内容。传统系统在分块时无法有效捕捉这些局部重复，导致大量冗余未被识别和消除。如图~\ref{fig:0302}所示，在使用多个版本的 Linux 系统源码 tar 包作为负载时，
+    开源块级去重系统 Destor 结合 Zstd 压缩算法的数据缩减率\footnote{数据缩减率 = 存储数据原始大小 / 去重压缩后大小}随数据块平均大小的增加而明显下降，反映了其处理大块数据局部重复的不足。
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.8\textwidth]{../figures/0302系统数据缩减率随数据块平均大小变化情况.pdf}
+        \includegraphics[width=0.65\textwidth]{../figures/0302系统数据缩减率随数据块平均大小变化情况.pdf}
         \bicaption{系统数据缩减率随数据块平均大小变化情况}{deduplication rate variation with average data block size}
-        \label{fig:c}
+        \label{fig:0302}
     \end{figure}
 
-    \item \textbf{难以应对混入的模型数据}：传统数据缩减系统依赖字节级别的精确匹配来识别冗余。然而，
-    AI 模型文件普遍存在数值冗余，即不同数据块在数值上高度相似但字节表示上存在细微差异。
-    这种特性使得传统系统难以通过简单的指纹比对有效识别此类冗余，导致数据缩减率大幅下降。如图~\ref{fig:b}所示，
+    \item \textbf{难以应对混入的模型数据}：传统系统难以通过简单的指纹比对有效识别模型数值冗余，导致数据缩减率大幅下降。如图~\ref{fig:b}所示，
     在一个包含文件数据（非模型）与 Transformer 模型 checkpoints（模型）的混合负载下，开源块级去重系统 Destor
     结合 Zstd 压缩算法的数据缩减率随着模型数据占比的增加而显著降低。当模型数据占比达到 100\% 时，数据缩减率几乎降至 1，直观地暴露了其在处理模型数值冗余方面的短板。
 
     \begin{figure}[htbp]
         \centering
-        \includegraphics[width=0.8\textwidth]{../figures/0301系统数据缩减率随模型数据比例变化情况.pdf}
+        \includegraphics[width=0.65\textwidth]{../figures/0301系统数据缩减率随模型数据比例变化情况.pdf}
         \bicaption{系统数据缩减率随模型数据比例变化情况}{Deduplication rate variation with model data proportion}\label{fig:b}
     \end{figure}
 
@@ -34,7 +32,7 @@
     \item \textbf{存储与计算开销较高}：为了提升去重效果，传统系统不得不采用更复杂的分块和指纹计算方法，这无疑增加了系统的存储和计算开销，进而影响了整体性能和可扩展性。这也是增量压缩等更细粒度的去重技术难以在工业界大规模应用的主要原因。
 \end{enumerate}
 
-尽管传统方法效果不佳，但这些新型数据中蕴含着大量未被有效利用的\textbf{细粒度冗余}，具体包括：
+这些新型数据中蕴含着大量未被有效利用的\textbf{细粒度冗余}，具体包括：
 \begin{itemize}
     \item \textbf{大块数据的局部重复}：在非模型数据的大块中，即使整个数据块不完全相同，其内部也常常包含大量相同或高度相似的局部内容。
     \item \textbf{模型数值冗余}：主要表现为浮点数（如 BF16/FP32）的指数高位高度相似，而尾数位存在细微差异。如图~\ref{fig:d}所示，通过分析 Transformer 模型文件中 BF16 浮点数各比特位的熵值\footnote{熵值用于衡量该位的不确定性或不相似程度，数据越集中则熵值越低。熵为 0 表示该位在所有采样数据中取值完全相同（全 0 或全 1）~\cite{shannon2001mathematical}。}可以发现，9\textasciitilde14 位的指数部分熵值远低于尾数部分，表明这些位存在大量冗余，而传统方法无法利用这一点。
@@ -42,14 +40,13 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../figures/0303模型文件中BF16浮点数各bit位熵值.pdf}
+    \includegraphics[width=0.65\textwidth]{../figures/0303模型文件中BF16浮点数各bit位熵值.pdf}
     \bicaption{模型文件中 BF16 浮点数各 bit 位熵值}{Bit entropy values of BF16 floating-point numbers in model files}\label{fig:d}
 \end{figure}
 
 针对上述问题，现有的优化方案各有局限。Finesse、Odess 等系统引入了增量压缩，能更深入地挖掘块内冗余，但计算开销高昂，
 且未能针对模型数据进行有效处理。另一方面，专用的模型压缩方法（如 ZipNN、ZipLLM）虽然高效，
 但高度依赖模型数据的特定结构，无法应用于混合工作负载的云存储系统，甚至可能对非模型数据产生负面效果。
-
 基于以上分析，我们提出以下设计目标：
 
 从功能设计出发，主要为以下三点，本章将对其进行详细阐述：
@@ -60,30 +57,34 @@
     \item \textbf{模型数据处理优化}：对于被分离出的模型数据，系统应充分挖掘其数值冗余，设计相应的处理策略以进一步提升整体的数据缩减效果。
 \end{enumerate}
 
+% 从系统设计出发，主要考虑以下两点，本文第四章将详细介绍相关优化与实现：
 
+% \begin{enumerate}
+%     \item \textbf{计算与存储开销控制}：在保证去重效果的同时，必须控制额外的计算与存储开销，避免对系统整体性能造成显著影响。
+%     \item \textbf{低侵入性集成}：系统设计应与现有云存储的传统数据缩减工作流兼容，尽可能降低集成复杂度和对现有系统的改造。
+% \end{enumerate}
 
-从系统设计出发，主要考虑以下两点，本文第四章将详细介绍相关优化与实现：
-
-\begin{enumerate}
-    \item \textbf{计算与存储开销控制}：在保证去重效果的同时，必须控制额外的计算与存储开销，避免对系统整体性能造成显著影响。
-    \item \textbf{低侵入性集成}：系统设计应与现有云存储的传统数据缩减工作流兼容，尽可能降低集成复杂度和对现有系统的改造。
-\end{enumerate}
-
-
-\section{系统总体设计}
-基于此，本文提出了一种面向混合负载\footnote{混合负载指存储目标中既有模型数据，又有传统的文本、日志、代码等数据}的细
-粒度冗余识别数据缩减系统（Fine-grained Hybrid Redundancy Deduplication, FHRD），其总体架构如
-图~\ref{fig:FHRD_architecture}所示。该系统在传统块级去重和通用压缩工作流的基础上，集成了多个新模块，
-赋予了系统数据类型鉴别、模型数据数值冗余提取以及大块数据局部重复识别的能力。其核心在于突破了传统单一去重策略
-的限制，引入了基于内容的数据类型鉴别机制，并在此基础上实现了自适应的差异化处理流程，针对模型文件的数值冗余
-和大块数据的局部重复分别进行了专门的去重策略设计与优化。
-
+综上，系统的设计思路如图~\ref{fig:idea}所示。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{../figures/0300overview.drawio.pdf}
-    \bicaption{总体设计}{Overall design}
-    \label{fig:c}
+    \bicaption{设计思路}{Design idea}
+    \label{fig:idea}
+\end{figure}
+
+
+\section{系统总体设计}
+基于上述设计思路，本文提出了一种面向混合负载\footnote{混合负载指存储目标中既有模型数据，又有传统的文本、日志、代码等数据}的细
+粒度冗余识别数据缩减系统（Fine-grained Hybrid Redundancy Deduplication, FHRD）。如
+图~\ref{fig:FHRD_architecture}所示，该系统在传统块级去重和通用压缩工作流的基础上，集成了多个新模块，
+赋予了系统数据块局部冗余去除、模型数据鉴别分离以及模型数据编码压缩的能力。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1.0\textwidth]{../figures/0304细粒度冗余识别的数据缩减系统总体架构.drawio.pdf}
+    \bicaption{细粒度冗余识别的数据缩减系统设计}{design of fine-grained redundancy-aware deduplication system}
+    \label{fig:FHRD_architecture}
 \end{figure}
 
 \section{细粒度子块去重模块设计}
@@ -115,11 +116,40 @@
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{../figures/0305浮点数二进制.png}
+    \includegraphics[width=0.6\textwidth]{../figures/0305浮点数二进制.png}
     \bicaption{16 位浮点数二进制内容}{Binary representation of 16-bit floating-point numbers}\label{fig:float_binary}
 \end{figure}
 
 
+
+
+
+
+
+
+基于上述定义，若仅依赖文件格式进行判断，将导致大量误判。例如，一个归档文件（如 \texttt{.tar}）或磁盘镜像（如 \texttt{.img}）可能同时包含模型与非模型数据；
+反之，一个模型权重文件内部也可能包含文件头、元数据等不具备数值冗余特性的“非模型”部分。因此，本文创新性地提出采用块级鉴别的方法，深入数据内容特征进行分析。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../figures/0306数据类型鉴别模块.drawio.pdf}
+    \bicaption{基于分组熵值分析的数据类型鉴别方法}{Data type classification method based on grouped entropy analysis}\label{fig:data_type_classification}
+\end{figure}
+
+
+% \subsection{基于分组熵值分析的数据类型鉴别方法}
+如图~\ref{fig:float_binary}所示，模型数据块中的浮点数，其指数位通常集中在特定的比特位范围内
+（例如，16 位浮点数的第 9\textasciitilde14 位），参考图~\ref{fig:d}，这些位的熵值显著低于其他部分。
+而非模型数据块则缺乏这种清晰的熵值分布特征。利用这一差异，我们设计了基于分组熵值分析的数据类型鉴别方法，
+如图~\ref{fig:data_type_classification}所示。
+
+该方法首先对数据块进行偏移抽样以降低计算开销，然后将采样浮点数按位分组，并计算每个比特位分组的熵值。通过分析熵值分布规律：
+\begin{itemize}
+    \item 若第 9\textasciitilde14 位熵值显著低于其他位，则判定为 16 位浮点数模型数据块。
+    \item 若第 25\textasciitilde30 位熵值显著低于其他位，则判定为 32 位浮点数模型数据块\footnote{分别对应 BF16 和 FP32 格式浮点数的指数高位。}。
+    \item 若无明显低熵区间，则判定为非模型数据块。
+\end{itemize}
+随后将模型数据从主流程分离，送入模型编码压缩模块。
 
 \begin{table}[!hpt]
     \bicaption{鉴别粒度对比表}{Comparison of identification granularity}\label{tab:comparison_of_identification_granularity}
@@ -148,54 +178,36 @@
     \end{tabular}
 \end{table}
 
-基于上述定义，若仅依赖文件格式进行判断，将导致大量误判。例如，一个归档文件（如 \texttt{.tar}）或磁盘镜像（如 \texttt{.img}）可能同时包含模型与非模型数据；
-反之，一个模型权重文件内部也可能包含文件头、元数据等不具备数值冗余特性的“非模型”部分。因此，本文创新性地提出采用块级鉴别的方法，深入数据内容特征进行分析。
-
-如表~\ref{tab:comparison_of_identification_granularity}所示，与文件级鉴别相比，在块级粒度进行数据类型鉴别具有显著优势：
+与文件级鉴别相比，在块级粒度进行数据类型鉴别具有显著优势，如表~\ref{tab:comparison_of_identification_granularity}所示：
 \begin{enumerate}
     \item \textbf{精确识别}：块级鉴别能够针对数据块的实际内容进行分析，精准区分混合在同一文件中的模型数据与非模型数据，避免了文件级鉴别带来的误判风险。
     \item \textbf{灵活适应}：能够灵活适应包含多种数据类型的混合负载场景，确保每个数据块都得到最恰当的处理。
     \item \textbf{易于集成}：块级鉴别可以作为独立模块无缝嵌入到传统块级去重流水线中，对现有系统侵入性低，易于部署。
 \end{enumerate}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{../figures/0306数据类型鉴别模块.drawio.pdf}
-    \bicaption{基于分组熵值分析的数据类型鉴别方法}{Data type classification method based on grouped entropy analysis}\label{fig:data_type_classification}
-\end{figure}
-
-
-% \subsection{基于分组熵值分析的数据类型鉴别方法}
-如图~\ref{fig:float_binary}所示，模型数据块中的浮点数，其指数位通常集中在特定的比特位范围内
-（例如，16 位浮点数的第 9\textasciitilde14 位），参考图~\ref{fig:d}，这些位的熵值显著低于其他部分。
-而非模型数据块则缺乏这种清晰的熵值分布特征。利用这一差异，我们设计了基于分组熵值分析的数据类型鉴别方法，
-如图~\ref{fig:data_type_classification}所示。
 
 
 
 
 
-该方法首先对数据块进行偏移抽样以降低计算开销，然后将采样浮点数按位分组，并计算每个比特位分组的熵值。通过分析熵值分布规律：
-\begin{itemize}
-    \item 若第 9\textasciitilde14 位熵值显著低于其他位，则判定为 16 位浮点数模型数据块。
-    \item 若第 25\textasciitilde30 位熵值显著低于其他位，则判定为 32 位浮点数模型数据块\footnote{分别对应 BF16 和 FP32 格式浮点数的指数高位。}。
-    \item 若无明显低熵区间，则判定为非模型数据块。
-\end{itemize}
-随后将模型数据从主流程分离，送入模型编码压缩模块。
+
+
 
 \section{模型编码压缩模块设计}
 
+
+
+
+模型数据中存在的数值冗余无法被传统通用压缩算法有效识别，其根本原因在于此类冗余的独特分布模式与通用压缩算法（如 LZ 系列）的核心工作原理不匹配。通用压缩算法擅长处理字节流中的\textbf{局部连续性冗余}，它们通过滑动窗口识别并压缩在窗口内重复出现的连续字节序列。
+
+然而，模型数据中的冗余模式（即重复的指数位高位）在字节流层面是\textbf{非连续的}。相似的指数高位分散，例如，在 32 位浮点数序列中，具有相似模式的指数位可能间隔数个字节才出现一次。这种跨字节的非连续分布，使得通用压缩算法难以捕捉到数值冗余，
+反而会因尝试对高度随机的尾数位进行无效匹配而引入不必要的计算开销，导致“性能退化”。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{../figures/0307模型数据处理模块.drawio.pdf}
     \bicaption{模型编码压缩模块}{Model encoding compression module}\label{fig:model_data_processing}
 \end{figure}
-
-模型数据中存在的数值冗余无法被传统通用压缩算法有效识别，其根本原因在于此类冗余的独特分布模式与通用压缩算法（如 LZ 系列）的核心工作原理不匹配。通用压缩算法擅长处理字节流中的\textbf{局部连续性冗余}，它们通过滑动窗口识别并压缩在窗口内重复出现的连续字节序列。
-
-然而，模型数据中的冗余模式（即重复的指数位高位）在字节流层面是\textbf{非连续的}。相似的指数高位分散，例如，在 32 位浮点数序列中，具有相似模式的指数位可能间隔数个字节才出现一次。这种跨字节的非连续分布，使得通用压缩算法难以捕捉到数值冗余，
-反而会因尝试对高度随机的尾数位进行无效匹配而引入不必要的计算开销，导致“性能退化”。
 
 为解决此问题，如图~\ref{fig:model_data_processing}所示，本文采用专用编码方法对模型数据块进行处理。
 该方法首先对数据块中的每个浮点数进行细粒度的按位拆分，将所有比特位分别集中在一起，形成不同的比特组。其中具有高度冗余的若干组（即图~\ref{fig:float_binary}中的红色区域），
@@ -204,9 +216,9 @@
 
 
 
-\section{存储去重工作流}
+\section{数据缩减工作流}
 在介绍系统的总体设计与各模块原理之后，本节将进一步阐明系统在处理存储请求时的具体工作流，
-以便于理解其实际运行过程及数据在各模块间的流转与变化。如图~\ref{fig:system_dedup_workflow}所示，
+以便理解其实际运行过程和数据在各模块间的流转与变化。如图~\ref{fig:system_dedup_workflow}所示，
 系统的存储去重工作流涵盖了从数据接收、初步去重、模型数据鉴别分离、细粒度冗余处理，直至最终数据存储的完整闭环。
 
 \begin{figure}[htbp]
@@ -235,7 +247,7 @@
 高效去除块内冗余、精准鉴别分离模型数据以及优化模型数据处理，提出了一种面向混合负载的细粒度冗余识别数据缩减系统（FHRD）。
 
 
-其次，本章详细阐述了 FHRD 的总体架构及其关键模块的设计原理。针对大块数据的局部重复问题，设计了细粒度子块去重模块，通过细粒度划分和相似块查找技术，实现了对块内冗余的深度挖掘；
+随后，本章介绍了 FHRD 的总体设计及其关键模块的设计原理。针对大块数据的局部重复问题，设计了细粒度子块去重模块，通过细粒度划分和相似块查找技术，实现了对块内冗余的深度挖掘；
 针对模型数据的数值冗余特性，设计了基于分组熵值分析的数据类型鉴别模块，实现了模型数据的精准识别与分离，并进一步设计了模型编码压缩模块，
 通过重组浮点数指数位，将不可压缩的数值冗余转化为可压缩形式。
 

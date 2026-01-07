@@ -1,26 +1,27 @@
 % !TEX root = ../main.tex
 
-% !TEX root = ../main.tex
 
 \begin{abstract}[zh]
     随着云计算和人工智能的快速发展，云存储系统面临着数据爆炸式增长的挑战。为了降低存储成本，数据缩减技术（如去重和压缩）被广泛应用。然而，现代云存储负载呈现出“大块化”和“模型化”的新趋势：为了提升 I/O 性能，系统倾向于使用更大的数据块，导致传统块级去重难以识别块内的局部冗余；同时，AI 模型数据在存储中占比激增，其特有的浮点数数值冗余无法被传统去重或通用压缩算法有效消除。现有的单一优化方案难以同时应对这种混合负载，甚至可能产生相互干扰。
 
-    针对上述问题，本文提出了一种面向混合负载的细粒度冗余识别数据缩减系统——FHRD (Fine-grained Hybrid Redundancy Deduplication)。该系统在传统数据缩减流水线的基础上，引入了细粒度冗余识别与差异化处理机制。首先，针对大块数据中的局部连续冗余，设计了细粒度子块去重模块，通过指数取整的双向子块定长分块、特征提取与双向匹配等方法，高效去除块内冗余。
-    其次，面对混合负载中干扰去重流程的模型数据，在模型数据分离模块中提出了字节粒度分组抽样熵值分析方法，能够精准、快速地识别混杂在负载中的模型数据块，并将其分离出常规去重流程。
-    最后，对于分离出的模型数据，在模型编码压缩模块中设计了基于熵值分析结论的字节分组压缩方法，通过重组浮点数指数位，将不可压缩的数值冗余转化为可压缩形式，从而显著提升压缩率。
+    针对上述问题，本文提出了一种面向混有模型数据的云存储负载的具有细粒度冗余识别能力的数据缩减系统——FHRD (Fine-grained Hybrid Redundancy Deduplication)。该系统在传统数据缩减流水线的基础上，引入了子块粒度的冗余识别与去重，以及模型数据的鉴别、分离与编码压缩能力。
+    首先，针对大块数据中的局部连续冗余，设计了细粒度子块去重模块，通过指数取整的双向子块定长分块、特征提取与双向匹配等方法，高效去除块内冗余。
+    其次，面对混合负载中干扰去重流程的模型数据，在模型数据分离模块中提出了字节粒度分组抽样熵值分析方法，能够精准、快速地鉴别混杂在负载中的模型数据块，并将其分离出常规去重流程。
+    最后，对于分离出的模型数据，在模型编码压缩模块中设计了基于熵值分析结论的字节分组压缩方法，通过重组排列浮点数，将不可压缩的数值冗余转化为可压缩形式，从而显著提升压缩率。
 
-    本文实现了 FHRD 原型，并进行了全面的实验评估。实验结果表明，在包含模型与非模型数据的混合负载下，FHRD 相比传统“变长分块+块级去重+通用压缩”方案，在保持良好吞吐性能的同时，平均数据缩减率提升了 21.7\% 到 38.4\%。
-    且随着大块化和混合化趋势的发展，该系统的优势愈发显著，有效解决了现代云存储环境下混合负载的数据缩减难题。
+    本文实现了 FHRD 原型，并进行了全面的实验评估。实验结果表明，在包含模型数据与传统数据的混合负载下，FHRD 相比 Destor 等传统“变长分块+块级去重+通用压缩”方案，在保持良好吞吐性能的同时，平均数据缩减率提升了 21.7\%，对比 Zipnn、Burst 等针对优化方案也有不同程度的提升。
+    且随着大块化和混合化趋势的发展，本文系统的优势愈发显著，最高可提升38.4\%的数据缩减率，证明其具有应对现代云存储环境下混合负载数据缩减问题的能力。
 \end{abstract}
 
 \begin{abstract}[en]
-    With the rapid development of cloud computing and artificial intelligence, cloud storage systems are facing the challenge of explosive data growth. To reduce storage costs, data reduction techniques such as deduplication and compression are widely used. However, modern cloud storage workloads exhibit new trends of ``large-chunk'' and ``model-heavy'' data: to improve I/O performance, systems tend to use larger data chunks, making it difficult for traditional block-level deduplication to identify intra-chunk local redundancy; meanwhile, the proportion of AI model data in storage is increasing rapidly, and its unique floating-point numerical redundancy cannot be effectively eliminated by traditional deduplication or general-purpose compression algorithms. Existing single optimization solutions struggle to handle such mixed workloads and may even cause mutual interference.
+    With the rapid development of cloud computing and artificial intelligence, cloud storage systems are facing the challenge of explosive data growth. To reduce storage costs, data reduction technologies (such as deduplication and compression) are widely used. However, modern cloud storage workloads exhibit new trends of "large blocks" and "modeling": to improve I/O performance, systems tend to use larger data blocks, making it difficult for traditional block-level deduplication to identify local redundancy within blocks; at the same time, the proportion of AI model data in storage has surged, and its unique floating-point numerical redundancy cannot be effectively eliminated by traditional deduplication or general compression algorithms. Existing single optimization solutions struggle to address this mixed workload simultaneously and may even interfere with each other.
 
-    To address these issues, this paper proposes a fine-grained hybrid redundancy deduplication system (FHRD) for mixed workloads. The system introduces fine-grained redundancy identification and differentiated processing mechanisms based on traditional data reduction pipelines. Firstly, for local continuous redundancy in large chunks, a fine-grained sub-chunk deduplication module is designed, which efficiently removes intra-chunk redundancy through an exponential rounding bidirectional fixed-length sub-chunk partitioning method, feature extraction, and bidirectional matching.
-    Secondly, to deal with model data that interferes with the deduplication process in mixed workloads, a model data separation module is designed, which utilizes a byte-level grouped sampling entropy analysis method that can accurately and quickly identify model data blocks mixed in the workload and separate them from the regular deduplication process.
-    Finally, for the separated model data, a model encoding compression module implements a byte-wise grouped compression method based on entropy analysis conclusions, which transforms incompressible numerical redundancy into compressible forms by reorganizing the exponent bits of floating-point numbers, thereby significantly improving compression rates.
+    To address these issues, this paper proposes a data reduction system with fine-grained redundancy identification capabilities for cloud storage workloads containing model data—FHRD (Fine-grained Hybrid Redundancy Deduplication). This system builds on the traditional data reduction pipeline by introducing sub-block level redundancy identification and deduplication, as well as model data identification, separation, and encoding compression capabilities.
+    First, to tackle the local continuous redundancy within large data blocks, a fine-grained sub-block deduplication module is designed, which efficiently removes intra-block redundancy through methods such as exponential rounding bidirectional sub-block fixed-length segmentation, feature extraction, and bidirectional matching.
+    Second, to address the model data that interferes with the deduplication process in mixed workloads, a byte-granularity grouped sampling entropy analysis method is proposed in the model data separation module, which can accurately and quickly identify model data blocks mixed in the workload and separate them from the conventional deduplication process.
+    Finally, for the separated model data, a byte-grouped compression method based on entropy analysis conclusions is designed in the model encoding compression module, which reorganizes and arranges floating-point numbers to transform incompressible numerical redundancy into compressible forms, thereby significantly improving the compression ratio.
 
-    This paper implements the FHRD prototype and conducts comprehensive experimental evaluations. The experimental results show that under mixed workloads containing both model and non-model data, FHRD achieves an average data reduction rate improvement of 21.7\% to 38.4\% compared to traditional ``variable-length chunking + block-level deduplication + general-purpose compression'' schemes while maintaining good throughput performance.
-    As the trends of large-chunk and mixed workloads continue to develop, the advantages of this system become increasingly significant, effectively addressing the challenges of data reduction in modern cloud storage environments.
+    The FHRD prototype is implemented and comprehensively evaluated. Experimental results show that under mixed workloads containing model data and traditional data, FHRD achieves an average data reduction rate improvement of 21.7\% compared to traditional "variable-length chunking + block-level deduplication + general compression" solutions such as Destor, while also showing different improvements compared to targeted optimization solutions like Zipnn and Burst.
+    As the trends of large blocks and mixed workloads continue to develop, the advantages of this system become increasingly significant, with a maximum data reduction rate improvement of 38.4\%, demonstrating its capability to address the data reduction challenges of mixed workloads in modern cloud storage environments.
 \end{abstract}
 
