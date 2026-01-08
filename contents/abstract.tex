@@ -13,6 +13,7 @@
     且随着大块化和混合化趋势的发展，本文系统的优势愈发显著，最高可提升38.4\%的数据缩减率，证明其具有应对现代云存储环境下混合负载数据缩减问题的能力。
 \end{abstract}
 
+
 \begin{abstract}[en]
     With the rapid development of cloud computing and artificial intelligence, cloud storage systems are facing the challenge of explosive data growth. To reduce storage costs, data reduction technologies (such as deduplication and compression) are widely used. However, modern cloud storage workloads exhibit new trends of "large blocks" and "modeling": to improve I/O performance, systems tend to use larger data blocks, making it difficult for traditional block-level deduplication to identify local redundancy within blocks; at the same time, the proportion of AI model data in storage has surged, and its unique floating-point numerical redundancy cannot be effectively eliminated by traditional deduplication or general compression algorithms. Existing single optimization solutions struggle to address this mixed workload simultaneously and may even interfere with each other.
 
