@@ -28,7 +28,7 @@
 
 %for single author (just remove % characters)
 \author{
-{\rm Liu Zhuo}\\
+{\rm LiuZhuo}\\
 Shanghai Jiao Tong University
 }
 
@@ -53,18 +53,18 @@ Experimental results show that under mixed workloads containing model data and t
 The maturity and ubiquity of cloud computing technology have significantly driven the development of the modern information technology industry. As one of its foundation stones, cloud storage systems are tasked with providing reliable and scalable data storage capabilities for massive global users. To effectively cope with the cost pressure brought by large-scale data~\cite{khan2024cloud}, \textbf{Data Reduction} technology has become an indispensable core technology in cloud storage systems~\cite{xia2016comprehensive}.
 
 However, in recent years, the efficiency of cloud storage data reduction has encountered a bottleneck, which is closely related to the changes in the workloads it carries.
-First, files in cloud storage workloads are becoming larger. To pursue high I/O throughput, modern storage systems tend to adopt larger data block sizes, which leads to a significant decline in the effectiveness of traditional deduplication technologies~\cite{meyer2012study, dubois2011key}. As the data block size increases, the probability of finding two completely identical data blocks decreases dramatically. Although these large blocks often contain a large number of local duplicate fragments, traditional coarse-grained deduplication based on the entire block is difficult to detect such "local continuous redundancy" within the block.
+First, files in cloud storage workloads are becoming larger. To pursue high I/O throughput, modern storage systems tend to adopt larger data block sizes, which leads to a significant decline in the effectiveness of traditional deduplication technologies~\cite{meyer2012study, dubois2011key}. As the data block size increases, the probability of finding two completely identical data blocks decreases dramatically. Although these large blocks often contain a large number of local duplicate fragments, it is difficult for traditional coarse-grained deduplication based on the entire block to detect such "local continuous redundancy" within the block.
 
-Second, with the breakthrough progress of artificial intelligence technology, more and more model data are mixed into cloud storage workloads. Model files are composed of hundreds of millions of independent floating-point tensors, and the data content presents a high degree of randomness and uniqueness. When the system splits different models into data blocks, almost every block will have a unique fingerprint, which makes the deduplication mechanism based on global fingerprint matching completely invalid. At the same time, general compression algorithms are also difficult to capture the high-order "numerical redundancy" inside floating-point numbers.
+Second, with the breakthrough progress of artificial intelligence technology, more and more model data are mixed into cloud storage workloads. Model files are composed of hundreds of millions of independent floating-point tensors, and the data content presents a high degree of randomness and uniqueness. When the system splits different models into data blocks, almost every block will have a unique fingerprint, which makes the deduplication mechanism based on global fingerprint matching completely invalid. At the same time, general compression algorithms also struggle to capture the "numerical redundancy" inside floating-point numbers.
 
-In summary, these two workload trends jointly shape a mixed workload where "model data and large block data coexist". Based on this, this study proposes and builds a fine-grained redundancy identification data reduction system named FHRD (Fine-grained Hybrid Redundancy Deduplication). This system first adds the ability to identify intra-block continuous redundancy on basis of the traditional deduplication pipeline. Second, the framework incorporates a lightweight model data identification and separation module. Finally, for the separated model data, the framework adopts a dedicated grouped encoding method to compress its numerical redundancy.
+In summary, these two workload trends jointly shape a mixed workload where "model data and large block data coexist". Based on this, this study proposes and builds a fine-grained redundancy identification data reduction system named FHRD (Fine-grained Hybrid Redundancy Deduplication). This system first adds the ability to identify intra-block continuous redundancy on the basis of the traditional deduplication pipeline. Second, the framework incorporates a lightweight model data identification and separation module. Finally, for the separated model data, the framework adopts a dedicated grouped encoding method to compress its numerical redundancy.
 
 %-------------------------------------------------------------------------------
 \section{Background and Motivation}
 %-------------------------------------------------------------------------------
 \textbf{Problem Analysis.} Traditional data reduction systems, which rely on coarse-grained block-level deduplication and general-purpose compression, are becoming increasingly inefficient for modern cloud storage workloads. This inefficiency stems primarily from two emerging trends: increasing block sizes and the proliferation of AI model data.
 
-First, as storage systems adopt larger block sizes to maximize throughput, the effectiveness of traditional deduplication declines. Large blocks often contain significant local repetitive content, but even a single byte difference prevents the entire block from determining a match. As shown in Figure~\ref{fig:block_size_reduction}, our experiments with Linux kernel source tarballs demonstrate that the data reduction rate of a standard Destor+Zstd~\cite{collet2018zstandard} setup drops noticeably as the average block size increases.
+First, as storage systems adopt larger block sizes to maximize throughput, the effectiveness of traditional deduplication declines. Large blocks often contain significant local repetitive content, but even a single byte difference prevents the entire block from determining a match. As shown in Figure~\ref{fig:block_size_reduction}, our experiments with Linux kernel source tarballs demonstrate that the data reduction rate of Destor+Zstd~\cite{collet2018zstandard} drops noticeably as the average block size increases.
 
 \begin{figure}[htbp]
     \centering
@@ -73,7 +73,7 @@ First, as storage systems adopt larger block sizes to maximize throughput, the e
     \label{fig:block_size_reduction}
 \end{figure}
 
-Second, the influx of model data (e.g., checkpoints) further exacerbates this issue. Model files consist largely of floating-point tensors with high variability, rendering fingerprint-based matching ineffective. As Figure~\ref{fig:mixed_workload_reduction} illustrates, in a mixed workload utilizing Transformer models, the data reduction rate plummets as the proportion of model data rises, approaching 1 (no reduction) when the workload is entirely model data.
+Second, the influx of model data (e.g., checkpoints) further exacerbates this issue. Model files consist largely of floating-point tensors, rendering fingerprint-based matching ineffective. As Figure~\ref{fig:mixed_workload_reduction} illustrates, in a mixed workload utilizing Transformer models, the data reduction rate plummets as the proportion of model data rises, approaching 1 (no reduction) when the workload is entirely model data.
 
 \begin{figure}[htbp]
     \centering
@@ -82,14 +82,16 @@ Second, the influx of model data (e.g., checkpoints) further exacerbates this is
     \label{fig:mixed_workload_reduction}
 \end{figure}
 
-\textbf{Analysis of Fine-grained Redundancy.} A deeper analysis reveals that while traditional methods fail, significant \textit{fine-grained redundancy} remains unexploited in these workloads:
+\textbf{Analysis of Fine-grained Redundancy:} A deeper analysis reveals that while traditional methods fail, significant \textit{fine-grained redundancy} remains unexploited in these workloads:
 \begin{itemize}
-    \item \textbf{Intra-block local redundancy}: In large non-model data blocks, although the global fingerprints differ, substantial contiguous sections often remain identical.
+    \item \textbf{Intra-block local redundancy}: In large non-model data blocks, although the global fingerprints differ, substantial redundancy still exists within similar blocks.
     \item \textbf{Model numerical redundancy}: In model data, floating-point numbers (BF16/FP32) exhibit high similarity in their exponent bits, while mantissa bits vary. Entropy analysis of Transformer models confirms that the exponent parts have much lower entropy than the mantissas, indicating a potential for compression if processed correctly.
 \end{itemize}
 
-\subsection{Design Goals}
-Ttextbf{Design Goals.} \begin{enumerate}
+
+\textbf{Design Goals:} To effectively address the challenges posed by mixed workloads with large blocks and model data, our system design focuses on the following key objectives:
+
+\begin{enumerate}
     \item \textbf{Fine-grained Deduplication}: The system must identify and remove local repetitions within large data blocks, effectively handling the "large block" trend.
     \item \textbf{Model Data Identification}: The system needs a low-overhead method to distinguish model data from traditional data, enabling specialized processing paths.
     \item \textbf{Model-Specific Compression}: For identified model data, the system should employ encoding strategies that transform numerical redundancy into a compressible format.
@@ -139,7 +141,7 @@ Content-Defined Chunking (CDC) (variable-length chunking)~\cite{muthitacharoen20
     \label{fig:variable_length_chunking}
 \end{figure}
 
-\textbf{Challenge 2: Inconsistent Sub-block Division.} However, CDC results in variable block sizes, which complicates sub-block partitioning using fixed number of sub-blocks. If we simply divide variable-length blocks into a fixed number of sub-blocks (e.g., 3 parts), the resulting sub-blocks will have different sizes, as shown in Figure~\ref{fig:fixed_length_chunking}. This misalignment means that even if the red parts are redundant, they cannot be matched because their boundaries do not align.
+\textbf{Challenge 2: Inconsistent Sub-block Division.} CDC results in variable block sizes, which complicates sub-block partitioning using fixed number of sub-blocks. If we simply divide variable-length blocks into a fixed number of sub-blocks (e.g., 3 parts), the resulting sub-blocks will have different sizes, as shown in Figure~\ref{fig:fixed_length_chunking}. This misalignment means that even if the red parts are redundant, they cannot be matched because their boundaries do not align.
 
 \begin{figure}[htbp]
     \centering
@@ -200,13 +202,12 @@ To quantitatively verify this, we analyzed the entropy~\cite{shannon2001mathemat
 
 \textbf{Optimization: Byte-granularity Grouped Sampling.} 
 To avoid bit-level complexity, we exploit the byte alignment of floating-point formats. As Figure~\ref{fig:float_representation} shows, although exponent bits cross byte boundaries, the "most significant" parts of the exponent often dominate specific bytes.
-We propose a \textbf{Byte-granularity Grouped Sampling Entropy Analysis} method. Instead of parsing floats, the system simply treats the data block as a byte stream. It samples bytes at fixed offsets (e.g., stride of 4) to form 4 "byte groups". 
+We propose a \textbf{Byte-granularity Grouped Sampling Entropy Analysis} method. Instead of parsing bits, the system simply treats the data block as a byte stream. It samples bytes at fixed offsets (e.g., stride of 4) to form 4 "byte groups". 
 By calculating the entropy of each group, we can identify specific "low-entropy byte groups" (Figure~\ref{fig:bytewise_entropy}).
 \begin{itemize}
-    \item If one low-entropy byte group differs significantly from three high-entropy groups, it indicates the pattern of FP32 (where the exponent concentrates in one byte).
+    \item If a low-entropy byte group and three high-entropy byte groups appear, it means that the data block is a model data block composed of 32-bit floating point numbers.
     \item If low-entropy occurs every 2 bytes, it indicates BF16/FP16.
 \end{itemize}
-This method transforms complex pattern recognition into a fast, vectorizable byte counting task.
 
 \begin{figure}[htbp]
     \centering
@@ -234,7 +235,7 @@ To fix this, we must reorganize the data to make redundant parts \textit{spatial
 We propose a \textbf{Byte Grouped Compression Method} as shown in Figure~\ref{fig:model_processing_module}. 
 Crucially, we do not blindly reorganize all bytes. 
 Since the separation module (Section 3.3) has already calculated the entropy distribution and identified which byte group contains the low-entropy exponents, we reuse this conclusion.
-As shown in Figure~\ref{fig:byte_group_compression}, the system extracts \textit{only} the identified low-entropy byte groups (e.g., Group 1 for FP32) and concatenates them into a continuous block. This block, now consisting of a pure stream of similar exponents, is highly compressible by Zstd. The remaining high-entropy groups are stored essentially uncompressed or lightly compressed. This selective approach reduces the heavy compression workload by 50-75\% compared to re-encoding the entire block, significantly optimizing CPU efficiency.
+As shown in Figure~\ref{fig:byte_group_compression}, the system extracts \textit{only} the identified low-entropy byte groups (e.g., Group 1 for FP32) and concatenates them into a continuous block. This block, now consisting of a pure stream of similar exponents, is highly compressible by Zstd. The remaining high-entropy groups are stored essentially uncompressed or lightly compressed. This selective approach reduces the compression inputs by 50-75\% compared to re-encoding the entire block, significantly optimizing CPU efficiency.
 
 \begin{figure}[htbp]
     \centering
@@ -249,7 +250,7 @@ As shown in Figure~\ref{fig:byte_group_compression}, the system extracts \textit
 \section{Implementation}
 %-------------------------------------------------------------------------------
 \subsection{Prototype Implementation}
-We implemented a prototype of FHRD based on the open-source deduplication system Destor. The core functions, including fine-grained sub-block deduplication, model data identification, and encoding compression, were implemented with approximately 3,000 lines of C++ code. The system also integrates the Zstandard (Zstd) library~\cite{collet2018zstandard} for general-purpose compression.
+We implemented a prototype of FHRD based on the open-source deduplication system Destor. The core functions, including fine-grained sub-block deduplication, model data identification, and encoding compression, were implemented with C++ code. The system also integrates the Zstandard (Zstd) library~\cite{collet2018zstandard} for general-purpose compression.
 
 \textbf{Data Block Structure.} To accommodate fine-grained metadata, we reconstructed the data block structure. The container format was extended to store sub-block headers and determining flags, allowing the restoration engine to correctly identify and reassemble fine-grained deduplicated blocks and encoded model data.
 
@@ -284,8 +285,9 @@ Ideally, the system sequentially queries the Local Cache, Temporary Index Cache,
 \section{Evaluation}
 %-------------------------------------------------------------------------------
 \subsection{Experimental Setup}
+
 \textbf{Hardware Environment.} 
-We evaluate FHRD on a dual-socket server equipped with two AMD EPYC 7763 processors (64 cores each, 128 logical cores total) and 128GB DDR4 DRAM. The storage setup consists of two 1TB SSDs for hosting the operating system and metadata, and five 16TB HDDs for data storage. The operating system is Ubuntu 24.04 LTS with Linux kernel 6.14.0.
+We evaluate FHRD on a server equipped with two AMD EPYC 7763 processors (64 cores each, 128 logical cores total) and 128GB DDR4 DRAM. The storage setup consists of two 1TB SSDs for hosting the operating system and metadata, and five 16TB HDDs for data storage. The operating system is Ubuntu 24.04 LTS with Linux kernel 6.14.0.
 
 \textbf{Datasets.} 
 To comprehensively evaluate the system's performance on mixed workloads, we use a combination of non-model and model datasets. 
@@ -343,7 +345,6 @@ To further validate the effectiveness of our design choices, we present a detail
 
 \subsubsection{Effectiveness of Sub-block Deduplication}
 We evaluate the "Exponential Rounding Bidirectional Sub-block Fixed-length Segmentation" method by comparing it with a simplified version (FHRD-2, which uses uniform splitting) and BURST+ (which only handles boundary redundancy). Figure~\ref{fig:non_model_dedup} shows the reduction rates on non-model datasets.
-textbf{Effectiveness of Sub-block Deduplication.} We evaluate the "Exponential Rounding Bidirectional Sub-block Fixed-length Segmentation" method by comparing it with a simplified version (FHRD-2, which uses uniform splitting) and BURST+ (which only handles boundary redundancy). Figure~\ref{fig:non_model_dedup} shows the reduction rates on non-model datasets.
 
 \begin{figure}[htbp]
     \centering
@@ -352,9 +353,9 @@ textbf{Effectiveness of Sub-block Deduplication.} We evaluate the "Exponential R
     \label{fig:non_model_dedup}
 \end{figure}
 
-FHRD consistently outperforms FHRD-2 (by ~8.9\%) and BURST+ (by ~13.5\%). This proves that our exponential rounding strategy is superior to simple uniform division in capturing intra-block redundancy, especially in datasets with frequent modifications like \textit{code} and \textit{lnx-ker}. While BURST+ only addresses boundary shifts, FHRD effectively uncovers redundancy deep within the blocks.
+FHRD consistently outperforms FHRD-2 (by ~8.9\%) and BURST+ (by ~13.5\%). This proves that our exponential rounding strategy is superior to simple uniform division in capturing intra-block redundancy, especially in datasets with frequent modifications like \textit{code} and \textit{lnx-ker}. While BURST+ only addresses boundary redundancy, FHRD effectively uncovers redundancy deep within the blocks.
 
-\textbf{Accuracy and Efficiency of Model Separation.} The accuracy of the Model Data Separation Module is critical. We define a "model block" as one that gains >10\% space savings from our specialized compression. We compared our **Byte-level** entropy analysis against File-level (extension-based) and Bit-level entropy analysis.
+\subsubsection{Accuracy and Efficiency of Model Separation.} The accuracy of the Model Data Separation Module is critical. We define a "model block" as one that gains >10\% space savings from our specialized compression. We compared our **Byte-level** entropy analysis against File-level (extension-based) and Bit-level entropy analysis.
 
 \begin{figure}[htbp]
     \centering
@@ -363,7 +364,7 @@ FHRD consistently outperforms FHRD-2 (by ~8.9\%) and BURST+ (by ~13.5\%). This p
     \label{fig:separation_accuracy}
 \end{figure}
 
-As shown in Figure~\ref{fig:separation_accuracy}, both Byte-level and Bit-level methods achieve >98\% accuracy, significantly outperforming File-level detection (which suffers from high false positives on quantized models and false negatives on non-standard extensions). 
+As shown in Figure~\ref{fig:separation_accuracy}, both Byte-level and Bit-level methods achieve >98\% accuracy, significantly outperforming File-level detection (which suffers from high false positives on quantized models and false negatives on non-standard file extensions). 
 However, in terms of throughput (Figure~\ref{fig:separation_throughput}), our Byte-level method is ~69.6\% faster than the Bit-level approach. This confirms that our byte-granularity optimization achieves the optimal balance between high accuracy and low overhead.
 
 \begin{figure}[htbp]
@@ -373,21 +374,26 @@ However, in terms of throughput (Figure~\ref{fig:separation_throughput}), our By
     \label{fig:separation_throughput}
 \end{figure}
 
-\textbf{Effectiveness of Model Compression.} \begin{figure}[htbp]
+\subsubsection{Effectiveness of Model Compression.} 
+
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\linewidth]{figures/0507基于熵值分析结论的字节分组压缩效果对比.pdf}
+    \includegraphics[width=0.8\linewidth]{figures/0507基于熵值分析结论的字节分组压缩效果对比.pdf}
     \bicaption{Effectiveness of Entropy-based Byte Grouped Compression}{Effectiveness of Entropy-based Byte Grouped Compression}
     \label{fig:model_compression}
 \end{figure}
 
-FHRD matches the reduction rate of the specialized ZIPNN++ on pure model data. Importantly, compared to FHRD-1, FHRD achieves similar reduction rates but with ~80\% higher compression throughput (Figure~\ref{fig:compression_throughput}). By selectively compressing only low-entropy byte groups, FHRD avoids wasting CPU cycles on random mantissa bytes, significantly optimizing the computational efficiency of the compression stage.
-
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\linewidth]{figures/0508压缩线程吞吐量对比.pdf}
+    \includegraphics[width=0.8\linewidth]{figures/0508压缩线程吞吐量对比.pdf}
     \bicaption{Comparison of Compression Thread Throughput}{Comparison of Compression Thread Throughput}
     \label{fig:compression_throughput}
 \end{figure}
+
+
+FHRD matches the reduction rate of the specialized ZIPNN++ on pure model data as shown in Figure~\ref{fig:model_compression}. Importantly, compared to FHRD-1, 
+FHRD achieves similar reduction rates but with ~80\% higher compression throughput (Figure~\ref{fig:compression_throughput}). By selectively compressing only low-entropy byte groups, FHRD avoids wasting CPU cycles on random mantissa bytes, significantly optimizing the computational efficiency of the compression stage.
+
 
 \subsection{Impact of Workload Characteristics}
 Finally, we analyze how FHRD performs under the two evolving trends identified in Section 1: increasing model data proportion and larger block sizes.
@@ -401,21 +407,21 @@ Finally, we analyze how FHRD performs under the two evolving trends identified i
 \end{figure}
 Partial solutions like BURST+ degrade as model data increases, while model-specific tools like ZIPNN++ fail on non-model data. FHRD, however, maintains the highest reduction rate across the entire spectrum. This demonstrates its robustness in handling arbitrary mixed workloads, dynamically applying the best strategy for each data block.
 
-\textbf{Impact of Data Block Size.} Figure~\ref{fig:impact_blocksize} shows the reduction rate as the average block size grows from 4KB to 128KB.
+\textbf{Impact of Data Block Size.} Figure~\ref{fig:impact_blocksize} shows the reduction rate as the average block size grows from 4KB to 100KB.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{figures/0514数据缩减率随块大小变化情况.pdf}
     \bicaption{Deduplication Rate vs. Average Block Size}{Deduplication Rate vs. Average Block Size}
     \label{fig:impact_blocksize}
 \end{figure}
-Traditional BASE deduplication suffers severely as blocks get larger. FHRD, thanks to its sub-block deduplication, mitigates this decline. At 128KB block size, FHRD improves the reduction rate by 38.4\% compared to BASE. This confirms that FHRD effectively solves the "large block" challenge by uncovering fine-grained redundancy that coarse-grained deduplication misses.
+Traditional BASE deduplication suffers severely as blocks get larger. FHRD, thanks to its sub-block deduplication, mitigates this decline. At 100KB block size, FHRD improves the reduction rate by 38.4\% compared to BASE. This confirms that FHRD effectively solves the "large block" challenge by uncovering fine-grained redundancy that coarse-grained deduplication misses.
 
 %-------------------------------------------------------------------------------
 \section{Related Work}
 %-------------------------------------------------------------------------------
 
 \textbf{Traditional Deduplication.} Data reduction systems typically employ a pipeline of chunking, fingerprinting, deduplication, and compression~\cite{xia2016comprehensive}.
-\textbf{Fixed-Size Chunking (FSC)} segments data into uniform blocks, which is efficient but suffers from the "boundary shift problem"~\cite{quinlan2002venti}. A single byte insertion can offset all subsequent boundaries, nullifying deduplication.
+\textbf{Fixed-Size Chunking (FSC)} segments data into uniform blocks, which is efficient but suffers from the "boundary shift problem". A single byte insertion can offset all subsequent boundaries, nullifying deduplication.
 \textbf{Content-Defined Chunking (CDC)}, using algorithms like Rabin fingerprinting~\cite{rabin1981fingerprinting}, solves this by determining boundaries based on content rolling hashes~\cite{muthitacharoen2001low, xia2016fastcdc}. This approach is the industry standard for handling data modifications but struggles with the "large block" trend, where local redundancy within large chunks remains undetected.
 
 \textbf{Delta Compression and Fine-grained Deduplication.} To address intra-block redundancy, \textbf{Delta Compression} techniques like ODESS~\cite{xia2023design} enable byte-level deduplication. By globally searching for similar base chunks and storing only the differences (deltas)~\cite{tan2024design, zhang2019finesse}, they achieve high reduction rates. However, the computational overhead of feature extraction and delta calculation is prohibitive for high-performance primary storage.

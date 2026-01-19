@@ -23,7 +23,7 @@
         <mxCell id="SyDpbFkgnzRnrAFSgt7r-30" value="细粒度子块去重" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="595" y="360" width="170" height="230" as="geometry" />
         </mxCell>
-        <mxCell id="SyDpbFkgnzRnrAFSgt7r-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;entryX=-0.006;entryY=0.158;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-2" edge="1" target="SyDpbFkgnzRnrAFSgt7r-40">
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-39" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;entryX=-0.006;entryY=0.158;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-2" target="SyDpbFkgnzRnrAFSgt7r-40" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="110" y="350" as="targetPoint" />
           </mxGeometry>
@@ -46,7 +46,7 @@
         <mxCell id="SyDpbFkgnzRnrAFSgt7r-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-7" target="SyDpbFkgnzRnrAFSgt7r-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="SyDpbFkgnzRnrAFSgt7r-7" value="数据切块" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="SyDpbFkgnzRnrAFSgt7r-7" value="数据分块" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="240" y="320" width="240" height="40" as="geometry" />
         </mxCell>
         <mxCell id="SyDpbFkgnzRnrAFSgt7r-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=16;fontStyle=1;strokeWidth=3;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="SyDpbFkgnzRnrAFSgt7r-8" target="SyDpbFkgnzRnrAFSgt7r-9" edge="1">

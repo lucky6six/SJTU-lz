@@ -418,7 +418,7 @@ Traditional BASE deduplication suffers severely as blocks get larger. FHRD, than
 %-------------------------------------------------------------------------------
 
 \textbf{Traditional Deduplication.} Data reduction systems typically employ a pipeline of chunking, fingerprinting, deduplication, and compression~\cite{xia2016comprehensive}.
-\textbf{Fixed-Size Chunking (FSC)} segments data into uniform blocks, which is efficient but suffers from the "boundary shift problem"~\cite{quinlan2002venti}. A single byte insertion can offset all subsequent boundaries, nullifying deduplication.
+\textbf{Fixed-Size Chunking (FSC)} segments data into uniform blocks, which is efficient but suffers from the "boundary shift problem". A single byte insertion can offset all subsequent boundaries, nullifying deduplication.
 \textbf{Content-Defined Chunking (CDC)}, using algorithms like Rabin fingerprinting~\cite{rabin1981fingerprinting}, solves this by determining boundaries based on content rolling hashes~\cite{muthitacharoen2001low, xia2016fastcdc}. This approach is the industry standard for handling data modifications but struggles with the "large block" trend, where local redundancy within large chunks remains undetected.
 
 \textbf{Delta Compression and Fine-grained Deduplication.} To address intra-block redundancy, \textbf{Delta Compression} techniques like ODESS~\cite{xia2023design} enable byte-level deduplication. By globally searching for similar base chunks and storing only the differences (deltas)~\cite{tan2024design, zhang2019finesse}, they achieve high reduction rates. However, the computational overhead of feature extraction and delta calculation is prohibitive for high-performance primary storage.
